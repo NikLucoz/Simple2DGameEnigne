@@ -5,6 +5,7 @@ out/
 .idea/
 .vs/
 .vscode/
+.xmake/
 build/
 
 # Compiled files

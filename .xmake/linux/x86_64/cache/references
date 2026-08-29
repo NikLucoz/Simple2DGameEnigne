@@ -1,7 +1,0 @@
-{
-    packages = {
-        "/home/polaroid/.xmake/packages/p/python/3.14.3/5b29e409d339499392171d61390dfc38",
-        "/home/polaroid/.xmake/packages/i/imgui/v1.91.9/7822820c929a466bbcf9c034687c1023",
-        "/home/polaroid/.xmake/packages/i/imgui-sfml/v3.0/5ae4166e1f5249f49aa0343493b09d44"
-    }
-}
