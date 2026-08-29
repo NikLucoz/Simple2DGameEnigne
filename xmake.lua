@@ -29,7 +29,7 @@ add_packages("sfml", "imgui-sfml")
 -- Copy assets post-build
 -- Copy assets post-build
 after_build(function (target)
-    local src_fonts = path.join(target:scriptdir(), "src/assets/fonts/*")
-    local dst_fonts = path.join(target:targetdir(), "fonts")
-    os.cp(src_fonts, dst_fonts)
+    local src_assets = path.join(target:scriptdir(), "src/assets/*")
+    local dst_assets = path.join(target:targetdir(), "assets/")
+    os.cp(src_assets, dst_assets)
 end)

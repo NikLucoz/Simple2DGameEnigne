@@ -59,3 +59,13 @@ float Vector2::normalize()
     }
     return mag;
 }
+
+float Vector2::angle() const
+{
+    return atan2(this->x, this->y);
+}
+
+sf::Vector2<float> Vector2::toSFVector2() const
+{
+    return sf::Vector2<float>(this->x, this->y);
+}

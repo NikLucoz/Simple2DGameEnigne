@@ -4,13 +4,15 @@
 #include <tuple>
 
 #include "engine/components/CShape.h"
+#include "engine/components/CSprite.h"
 #include "engine/components/CTransform.h"
 
 using ComponentTuple = std::tuple<
     CTransform,
+    CSprite,
     CCircleShape,
-    CRectangleShape,
-    CPolygonShape
+    CPolygonShape,
+    CRectangleShape
 >;
 
 class Entity

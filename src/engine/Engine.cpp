@@ -101,7 +101,8 @@ void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     std::cout << "Mouse pressed at: (" << event.position.x << ", " << event.position.y << ")" << std::endl;
     auto e = m_entityManager.addEntity("test");
     e->add<CTransform>(Vector2{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vector2(0,0));
-    e->add<CCircleShape>(40, sf::Color::Red, sf::Color::White, 10);
+   //e->add<CCircleShape>(40, sf::Color::Red, sf::Color::White, 10);
+    e->add<CSprite>(Vector2(200, 300), Vector2(0,0), Vector2(1,1), "assets/sprites/Fireball.png");
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}

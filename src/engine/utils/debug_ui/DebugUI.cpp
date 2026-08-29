@@ -20,7 +20,7 @@ void DebugUI::Init(sf::RenderWindow& window)
     }
     
     ImGuiIO& io = ImGui::GetIO();
-   	ImFont* pFont = io.Fonts->AddFontFromFileTTF("/bin/fonts/arial.ttf", 14.0f);
+   	ImFont* pFont = io.Fonts->AddFontFromFileTTF("assets/fonts/fonts/arial.ttf", 14.0f);
 
     if (pFont) {
         ImGui::PushFont(pFont);

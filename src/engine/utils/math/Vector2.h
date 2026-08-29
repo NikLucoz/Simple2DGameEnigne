@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/System/Vector2.hpp>
 
 class Vector2
 {
@@ -14,4 +15,6 @@ public:
     float magnitude() const;
     float dot(const Vector2& other) const;
     float normalize();
+    float angle() const;
+    sf::Vector2<float> toSFVector2() const;
 };

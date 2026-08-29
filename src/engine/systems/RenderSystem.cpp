@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<Entity>> entities, float deltaTime)
 {
@@ -29,6 +30,29 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
         else if (e.has<CRectangleShape>())
         {
             
+        }
+        
+        if (e.has<CSprite>())
+        {
+            CSprite& sprite = e.get<CSprite>();
+            if (sprite.m_filepath.empty()) return;
+    
+            sf::Sprite sfSprite(sprite.getTexture());
+            sf::Vector2u textureSize = sprite.getTexture().getSize();
+            Vector2 desiredSize = sprite.getSize();
+            
+            Vector2 calculatedScale(
+                desiredSize.x / textureSize.x,
+                desiredSize.y / textureSize.y
+            );
+    
+            sf::Vector2f finalScale = (calculatedScale * sprite.getScale()).toSFVector2();
+            sfSprite.setScale(finalScale);
+    
+            sfSprite.setOrigin(sprite.getOrigin().toSFVector2());
+            sfSprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
+    
+            window.draw(sfSprite);
         }
     }
 }
