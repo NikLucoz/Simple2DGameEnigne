@@ -1,7 +1,7 @@
 #include "CSprite.h"
 #include <SFML/Graphics/Texture.hpp>
 
-CSprite::CSprite(Vector2 size, Vector2 origin, Vector2 scale, const std::string& filepath, sf::Color color)
+CSprite::CSprite(Vec2f size, Vec2f origin, Vec2f scale, const std::string& filepath, sf::Color color)
 {
     m_filepath = filepath;
     m_size = size;
@@ -14,17 +14,17 @@ CSprite::CSprite(Vector2 size, Vector2 origin, Vector2 scale, const std::string&
     if (!m_texture_.loadFromFile(filepath)) throw std::runtime_error("CSprite: failed to load \"" + m_filepath + "\"");
 }
 
-Vector2 CSprite::getSize()
+Vec2f CSprite::getSize()
 {
     return m_size;
 }
 
-Vector2 CSprite::getOrigin()
+Vec2f CSprite::getOrigin()
 {
     return m_origin;
 }
 
-Vector2 CSprite::getScale()
+Vec2f CSprite::getScale()
 {
     return m_scale;
 }

@@ -6,14 +6,14 @@
 class CTransform : public Component
 {
 public:
-    Vector2 position = {0.0f, 0.0f};
-    Vector2 velocity = {0.0f, 0.0f};
+    Vec2f position = {0.0f, 0.0f};
+    Vec2f velocity = {0.0f, 0.0f};
     float rotation = 0.0f;
 
     CTransform() = default;
-    CTransform(const Vector2& position, const Vector2& velocity, float rotation)
+    CTransform(const Vec2f& position, const Vec2f& velocity, float rotation)
         : position(position), velocity(velocity), rotation(rotation) {}
-    Vector2 getPosition() const { return position; }
-    Vector2 getVelocity() const { return velocity; }
+    Vec2f getPosition() const { return position; }
+    Vec2f getVelocity() const { return velocity; }
     float getRotation() const { return rotation; }
 };

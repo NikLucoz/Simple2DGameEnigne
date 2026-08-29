@@ -12,24 +12,18 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
         if (!e.has<CTransform>()) continue;
         CTransform& transform = e.get<CTransform>();
         
-        if (e.has<CCircleShape>())
+        if (e.has<CShape>())
         {
-            CCircleShape& circle = e.get<CCircleShape>();
-            sf::CircleShape sfCircle(circle.radius);
-            Vector2 pos = transform.getPosition();
-            sfCircle.setPosition(sf::Vector2f(pos.x, pos.y));
-            sfCircle.setFillColor(circle.fillColor);
-            sfCircle.setOutlineColor(circle.OutlineColor);
-            sfCircle.setOutlineThickness(circle.OutlineThickness);
-            window.draw(sfCircle);
-        }
-        else if (e.has<CPolygonShape>())
-        {
-            
-        }
-        else if (e.has<CRectangleShape>())
-        {
-            
+            CShape& shape = e.get<CShape>();
+            sf::CircleShape sfShape(shape.radius_);
+            Vec2f pos = transform.getPosition();
+            sfShape.setPointCount(shape.point_count_);
+            sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
+            sfShape.setOrigin({shape.radius_, shape.radius_});
+            sfShape.setFillColor(shape.fillColor_);
+            sfShape.setOutlineColor(shape.outlineColor_);
+            sfShape.setOutlineThickness(shape.outlineThickness_);
+            window.draw(sfShape);
         }
         
         if (e.has<CSprite>())
@@ -39,9 +33,9 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
     
             sf::Sprite sfSprite(sprite.getTexture());
             sf::Vector2u textureSize = sprite.getTexture().getSize();
-            Vector2 desiredSize = sprite.getSize();
+            Vec2f desiredSize = sprite.getSize();
             
-            Vector2 calculatedScale(
+            Vec2f calculatedScale(
                 desiredSize.x / textureSize.x,
                 desiredSize.y / textureSize.y
             );

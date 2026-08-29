@@ -1,58 +1,67 @@
 #include "Vector2.h"
 #include <cmath>
 
-Vector2::Vector2()
+template <class T>
+Vector2<T>::Vector2()
 {
-    this->x = 0.0f;
-    this->y = 0.0f;
+    this->x = 0;
+    this->y = 0;
 }
 
-Vector2::Vector2(float x, float y)
+template <class T>
+Vector2<T>::Vector2(T x, T y)
 {
     this->x = x;
     this->y = y;
 }
 
-bool Vector2::operator==(const Vector2& other) const
+template <class T>
+bool Vector2<T>::operator==(const Vector2<T>& other) const
 {
     return this->x == other.x && this->y == other.y;
 }
 
-Vector2 Vector2::operator+(const Vector2& other) const
+template <class T>
+Vector2<T> Vector2<T>::operator+(const Vector2<T>& other) const
 {
-    return Vector2(this->x + other.x, this->y + other.y);
+    return Vector2<T>(this->x + other.x, this->y + other.y);
 }
 
-Vector2 Vector2::operator-(const Vector2& other) const
+template <class T>
+Vector2<T> Vector2<T>::operator-(const Vector2<T>& other) const
 {
-    return Vector2(this->x - other.x, this->y - other.y);
+    return Vector2<T>(this->x - other.x, this->y - other.y);
 }
 
-Vector2 Vector2::operator*(const Vector2& other) const
+template <class T>
+Vector2<T> Vector2<T>::operator*(const Vector2<T>& other) const
 {
-    // Element-wise multiplication (Hadamard product)
-    return Vector2(this->x * other.x, this->y * other.y);
+    return Vector2<T>(this->x * other.x, this->y * other.y);
 }
 
-Vector2 Vector2::operator*(float f) const
+template <class T>
+Vector2<T> Vector2<T>::operator*(float f) const
 {
-    return Vector2(this->x * f, this->y * f);
+    return Vector2<T>(this->x * f, this->y * f);
 }
 
-float Vector2::magnitude() const
+template <class T>
+T Vector2<T>::magnitude() const
 {
     return sqrt(x * x + y * y);
 }
 
-float Vector2::dot(const Vector2& other) const
+template <class T>
+T Vector2<T>::dot(const Vector2<T>& other) const
 {
     return this->x * other.x + this->y * other.y;
 }
 
-float Vector2::normalize()
+template <class T>
+T Vector2<T>::normalize()
 {
-    float mag = this->magnitude();
-    if (mag > 0.0f)
+    T mag = this->magnitude();
+    if (mag > 0)
     {
         this->x /= mag;
         this->y /= mag;
@@ -60,12 +69,19 @@ float Vector2::normalize()
     return mag;
 }
 
-float Vector2::angle() const
+template <class T>
+T Vector2<T>::angle() const
 {
-    return atan2(this->x, this->y);
+    return atan2(this->y, this->x);  // Fixed: was atan2(x, y)
 }
 
-sf::Vector2<float> Vector2::toSFVector2() const
+template <class T>
+sf::Vector2<T> Vector2<T>::toSFVector2() const
 {
-    return sf::Vector2<float>(this->x, this->y);
+    return sf::Vector2<T>(this->x, this->y);
 }
+
+// Explicit instantiations (add these at the end)
+template class Vector2<float>;
+template class Vector2<int>;
+template class Vector2<double>;

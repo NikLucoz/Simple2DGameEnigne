@@ -9,10 +9,10 @@ using EntityVec = std::vector<std::shared_ptr<Entity>>;
 using EntityMap = std::map<std::string, EntityVec>;
 class EntityManager
 {
-    EntityVec m_entities;
-    EntityMap m_entitiesMap;
-    EntityVec m_toAdd;
-    size_t m_totalEntities = 0;
+    EntityVec entities_;
+    EntityMap entitiesMap_;
+    EntityVec toAdd_;
+    size_t totalEntities_ = 0;
 public: 
     EntityManager();
     void update();

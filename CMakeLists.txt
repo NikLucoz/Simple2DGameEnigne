@@ -23,7 +23,19 @@ if(NOT CURRENT_LINKER_FRONTEND_VARIANT)
 endif()
 
 # target
-add_executable(game_engine "")
+add_executable(game_engine ""
+        src/engine/entities/Entity.h
+        src/engine/systems/RenderSystem.h
+        src/engine/Engine.h
+        src/main.h
+        src/engine/components/CTransform.h
+        src/engine/entities/EntityManager.h
+        src/engine/components/CSprite.h
+        src/engine/components/CShape.h
+        src/engine/components/Component.h
+        src/engine/utils/math/Vector2.h
+        game/src/Game.h
+        game/src/Game.cpp)
 set_target_properties(game_engine PROPERTIES OUTPUT_NAME "game_engine")
 set_target_properties(game_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")
 target_include_directories(game_engine PRIVATE

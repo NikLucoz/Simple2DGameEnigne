@@ -1,19 +1,7 @@
 #include "CShape.h"
 
-CCircleShape::CCircleShape(float radius, sf::Color fillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
-    : radius(radius), fillColor(fillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
+CShape::CShape(float radius, int8_t point_count, sf::Color fillColor, sf::Color outlineColor, uint16_t outlineThickness)
+    : radius_(radius), point_count_(point_count), fillColor_(fillColor), outlineColor_(outlineColor), outlineThickness_(outlineThickness)
 {
-    exists = true;
-}
-
-CRectangleShape::CRectangleShape(float width, float height, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
-    : width(width), height(height), fillColor(FillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
-{
-    exists = true;
-}
-
-CPolygonShape::CPolygonShape(uint32_t pointCount, float radius, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
-    : pointCount(pointCount), radius(radius), fillColor(FillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
-{
-    exists = true;
+    active = true;
 }

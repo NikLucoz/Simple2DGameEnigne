@@ -10,18 +10,16 @@
 using ComponentTuple = std::tuple<
     CTransform,
     CSprite,
-    CCircleShape,
-    CPolygonShape,
-    CRectangleShape
+    CShape
 >;
 
 class Entity
 {
 private:
-    ComponentTuple m_components;
-    bool m_isMarkedForDestruction = false;
-    std::string m_tag = "default";
-    size_t m_id = 0;
+    ComponentTuple components_;
+    bool bIsMarkedForDestruction_ = false;
+    std::string tag_ = "default";
+    size_t id_ = 0;
 
     Entity();
     Entity(const std::string& tag, size_t id);
@@ -30,13 +28,13 @@ public:
     template <typename T>
     T& get()
     {
-        return std::get<T>(m_components);
+        return std::get<T>(components_);
     }
 
     template <typename T>
     bool has()
     {
-        return get<T>().exists;
+        return get<T>().active;
     }
 
     template <typename T, typename... TArgs>
@@ -44,7 +42,7 @@ public:
     {
         auto& component = get<T>();
         component = T(std::forward<TArgs>(mArgs)...);
-        component.exists = true;
+        component.active = true;
         return component;
     }
 
@@ -52,13 +50,13 @@ public:
     void remove()
     {
         get<T>() = T();
-        get<T>().exists = false;
+        get<T>().active = false;
     }
 
-    size_t id() const;
+    size_t getId() const;
     void destroy();
-    const std::string& tag() const;
-    bool is_marked_for_destruction() const;
+    const std::string& getTag() const;
+    bool isMarkedForDestruction() const;
     
     // with this only the EntityManager can create Entities since the constructors are private
     friend class EntityManager;

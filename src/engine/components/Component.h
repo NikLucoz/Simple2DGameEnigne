@@ -4,5 +4,5 @@ class Component
 {
     
 public:
-    bool exists = false;
+    bool active = false;
 };

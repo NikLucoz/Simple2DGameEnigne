@@ -96,8 +96,8 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     std::cout << "Mouse pressed at: (" << event.position.x << ", " << event.position.y << ")" << std::endl;
     auto e = m_entityManager.addEntity("test");
-    e->add<CTransform>(Vector2{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vector2(0,0), 0.0f);
-    e->add<CSprite>(Vector2(200, 300), Vector2(0,0), Vector2(1,1), "game/assets/sprites/Fireball.png");
+    e->add<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(0,0), 0.0f);
+    e->add<CSprite>(Vec2f(200, 300), Vec2f(0,0), Vec2f(1,1), "game/assets/sprites/Fireball.png");
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}

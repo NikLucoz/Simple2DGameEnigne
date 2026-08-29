@@ -6,41 +6,41 @@ EntityManager::EntityManager() = default;
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
 {
-    auto e = std::shared_ptr<Entity>(new Entity(tag, m_totalEntities++));
-    m_toAdd.push_back(e);
+    auto e = std::shared_ptr<Entity>(new Entity(tag, totalEntities_++));
+    toAdd_.push_back(e);
     return e;
 }
 
 void EntityManager::update()
 {
-    for (auto& e : m_toAdd)
+    for (auto& e : toAdd_)
     {
-        m_entities.push_back(e);
-        m_entitiesMap[e->tag()].push_back(e);
+        entities_.push_back(e);
+        entitiesMap_[e->getTag()].push_back(e);
     }
 
     std::vector<std::shared_ptr<Entity>> toRemove;
-    for (auto& e : m_entities)
+    for (auto& e : entities_)
     {
-        if (e->is_marked_for_destruction() == false) continue;
+        if (e->isMarkedForDestruction() == false) continue;
         toRemove.push_back(e);
     }
     
     for (auto& e : toRemove)
     {
-        auto it = std::find(m_entities.begin(), m_entities.end(), e);
-        m_entities.erase(it);
+        auto it = std::find(entities_.begin(), entities_.end(), e);
+        entities_.erase(it);
     }
     
-    m_toAdd.clear();
+    toAdd_.clear();
 }
 
 EntityVec& EntityManager::getEntities()
 {
-    return m_entities;
+    return entities_;
 }
 
 EntityVec& EntityManager::getEntities(const std::string& tag)
 {
-    return m_entitiesMap[tag];
+    return entitiesMap_[tag];
 }

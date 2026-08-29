@@ -3,36 +3,14 @@
 #include <variant>
 #include "engine/components/Component.h"
 
-class CCircleShape : public Component
+class CShape : public Component
 {
 public:
-    float radius;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CCircleShape() = default;
-    CCircleShape(float radius, sf::Color fillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
-};
-
-class CRectangleShape : public Component
-{
-public:
-    float width, height;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CRectangleShape() = default;
-    CRectangleShape(float width, float height, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
-};
-
-class CPolygonShape : public Component
-{
-public:
-    uint32_t pointCount;
-    float radius;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CPolygonShape() = default;
-    CPolygonShape(uint32_t pointCount, float radius, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
+    float radius_;
+    int8_t point_count_;
+    sf::Color fillColor_;
+    sf::Color outlineColor_;
+    uint16_t outlineThickness_;
+    CShape() = default;
+    CShape(float radius, int8_t point_count, sf::Color fillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
 };

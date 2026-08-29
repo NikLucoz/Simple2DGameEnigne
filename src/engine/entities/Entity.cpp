@@ -6,27 +6,27 @@ Entity::Entity()
 
 Entity::Entity(const std::string& tag, size_t id)
 {
-    m_tag = tag;
-    m_id = id;
+    tag_ = tag;
+    id_ = id;
 }
 
 
-size_t Entity::id() const
+size_t Entity::getId() const
 {
-    return m_id;
+    return id_;
 }
 
 void Entity::destroy()
 {
-    m_isMarkedForDestruction = true;
+    bIsMarkedForDestruction_ = true;
 }
 
-const std::string& Entity::tag() const
+const std::string& Entity::getTag() const
 {
-    return m_tag;
+    return tag_;
 }
 
-bool Entity::is_marked_for_destruction() const
+bool Entity::isMarkedForDestruction() const
 {
-    return m_isMarkedForDestruction;
+    return bIsMarkedForDestruction_;
 }

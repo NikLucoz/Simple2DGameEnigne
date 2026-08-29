@@ -38,7 +38,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
     // Group entities by tag locally for the first section
     std::map<std::string, EntityVec> entitiesByTag;
     for (auto& e : entities) {
-        entitiesByTag[e->tag()].push_back(e);
+        entitiesByTag[e->getTag()].push_back(e);
     }
 
     ImGui::Begin("Entity Debug Panel");
@@ -65,7 +65,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
                             ImGui::TableNextRow();
 
                             ImGui::TableSetColumnIndex(0);
-                            ImGui::Text("%d", (int)pair.second[i]->id());
+                            ImGui::Text("%d", (int)pair.second[i]->getId());
 
                             ImGui::TableSetColumnIndex(1);
                             ImGui::Text("%s", pair.first.c_str());
@@ -99,16 +99,16 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
                 ImGui::TableNextRow();
 
                 ImGui::TableSetColumnIndex(0);
-                std::string btnName = "D##" + std::to_string(entities[i]->id());
+                std::string btnName = "D##" + std::to_string(entities[i]->getId());
                 if (ImGui::Button(btnName.c_str(), ImVec2(40, 0))) {
                     entities[i]->destroy();
                 }
 
                 ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%d", (int)entities[i]->id());
+                ImGui::Text("%d", (int)entities[i]->getId());
 
                 ImGui::TableSetColumnIndex(2);
-                ImGui::Text("%s", entities[i]->tag().c_str());
+                ImGui::Text("%s", entities[i]->getTag().c_str());
 
                 auto& transform = entities[i]->get<CTransform>();
 
