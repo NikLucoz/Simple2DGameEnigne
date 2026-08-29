@@ -5,12 +5,17 @@
 #include <iostream>
 #include <engine/entities/EntityManager.h>
 
+#include "engine/utils/debug_ui/DebugUI.h"
+#include "systems/RenderSystem.h"
+
 class GameEngine {
 private:
     sf::RenderWindow window;
     sf::Clock clock;
     bool isRunning;
     EntityManager m_entityManager;
+    RenderSystem m_renderSystem;
+    DebugUI m_debugUI;
 
 public:
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
@@ -19,7 +24,7 @@ public:
     bool isOpen() const;
     void handleEvents();
     void update(float deltaTime);
-    void render();
+    void render(float deltaTime);
     void run();
 
 private:

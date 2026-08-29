@@ -1,33 +1,20 @@
 #pragma once
-#include "imgui.h"
-#include "imgui-SFML.h"
 #include <SFML/Graphics.hpp>
-#include "engine/entities/EntityManager.h"
-class DebugUI
-{
+#include <vector>
+#include <memory>
+#include "engine/entities/Entity.h"
+
+using EntityVec = std::vector<std::shared_ptr<Entity>>;
+
+class DebugUI {
 private:
-	// initialize IMGUI and create a clock used for its internal timing
-	sf::RenderWindow* Window;
-	
+	sf::RenderWindow* Window = nullptr;
+
 public:
 	DebugUI();
-
-	bool IsLifeSpanActive{ true };
-	bool IsSpawnerActive{ true };
-	bool IsMovementActive{ true };
-	bool IsSpecialShootActive{ true };
-	bool IsCollisionActive{ true };
-	bool IsRenderActive{ true };
-	bool IsGuiActive{ true };
-
-	int SpawnInterval;
-	bool ManuelSpawnFlag{ false };
-
-	void Init(sf::RenderWindow* window, uint16_t initialSpawnInterval);
-	void Update(sf::Clock& deltaClock, EntityMap& EntitiesMap);
+	void Init(sf::RenderWindow& window);
+	void Update(sf::Clock& deltaClock, const EntityVec& entities);
 	void Render();
 	void ProcessEvent(sf::Event& event);
-	int GetSpawnInterval();
-	bool GetManuelSpawnFlag();
 	bool GetAnyItemHovered();
 };

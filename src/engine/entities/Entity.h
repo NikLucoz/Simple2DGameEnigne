@@ -1,9 +1,17 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <tuple>
+
+#include "engine/components/CShape.h"
 #include "engine/components/CTransform.h"
 
-using ComponentTuple = std::tuple<CTransform>;
+using ComponentTuple = std::tuple<
+    CTransform,
+    CCircleShape,
+    CRectangleShape,
+    CPolygonShape
+>;
 
 class Entity
 {
@@ -24,7 +32,7 @@ public:
     }
 
     template <typename T>
-    bool has() const
+    bool has()
     {
         return get<T>().exists;
     }

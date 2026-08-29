@@ -1,150 +1,138 @@
 #include "DebugUI.h"
-
+#include <map>
+#include <imgui.h>
+#include <imgui-SFML.h>
 #include <iostream>
 
 #include "engine/entities/EntityManager.h"
+#include "engine/components/CTransform.h"
 
-DebugUI::DebugUI()
+DebugUI::DebugUI() {}
+
+void DebugUI::Init(sf::RenderWindow& window)
 {
+    
+    Window = &window;
+    
+    if (!ImGui::SFML::Init(*Window)) {
+        std::cerr << "Failed to initialize ImGui-SFML!\n";
+        return;
+    }
+    
+    ImGuiIO& io = ImGui::GetIO();
+   	ImFont* pFont = io.Fonts->AddFontFromFileTTF("/bin/fonts/arial.ttf", 14.0f);
+
+    if (pFont) {
+        ImGui::PushFont(pFont);
+    } else {
+        std::cerr << "Warning: Failed to load fonts/arial.ttf\n";
+    }
+    
+    ImGui::GetStyle().ScaleAllSizes(1.0f);
 }
 
-void DebugUI::Init(sf::RenderWindow* window, uint16_t initialSpawnInterval)
+void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
 {
-	Window = window;
-	ImGui::SFML::Init(*Window);
-	// scale the imgui ui by a given factor, does not affect text size
-	ImGui::GetStyle().ScaleAllSizes(1.0f);
-	SpawnInterval = initialSpawnInterval;
-}
+    ImGui::SFML::Update(*Window, deltaClock.restart());
 
-void DebugUI::Update(sf::Clock& deltaClock, EntityMap& EntitiesMap)
-{
-	ManuelSpawnFlag = false;
-	// update imgui for this freame with the time that the last frame took
-	ImGui::SFML::Update(*Window, deltaClock.restart());
+    // Group entities by tag locally for the first section
+    std::map<std::string, EntityVec> entitiesByTag;
+    for (auto& e : entities) {
+        entitiesByTag[e->tag()].push_back(e);
+    }
 
-	ImGui::Begin("Debug Panel");
-	//ImGui::Text("Parameters of Shapes");
+    ImGui::Begin("Entity Debug Panel");
 
-	if (ImGui::BeginTabBar("xxx"))
-	{
-		/*Systems Lab*/
-		if (ImGui::BeginTabItem("Systems"))
-		{
-			ImGui::Checkbox("Movement", &IsMovementActive);
-			ImGui::Checkbox("LifeSpan", &IsLifeSpanActive);
-			ImGui::Checkbox("Collision", &IsCollisionActive);
-			ImGui::Checkbox("Spawning", &IsSpawnerActive);
-			ImGui::Indent();
-			ImGui::SliderInt("Spawn Interval", &SpawnInterval, 10, 240);
-			ManuelSpawnFlag = ImGui::Button("Manuel Spawn", ImVec2(120, 30));
-			ImGui::Unindent();
-			ImGui::Checkbox("Special Shoot", &IsSpecialShootActive);
+    if (ImGui::CollapsingHeader("Entities by Tags", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Indent();
+        for (auto& pair : entitiesByTag)
+        {
+            std::string name = pair.first + " Entities (" + std::to_string(pair.second.size()) + ")";
+            
+            if (ImGui::CollapsingHeader(name.c_str()))
+            {
+                if (!pair.second.empty()) {
+                    if (ImGui::BeginTable(pair.first.c_str(), 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+                    {
+                        ImGui::TableSetupColumn("ID");
+                        ImGui::TableSetupColumn("Tag");
+                        ImGui::TableSetupColumn("Position");
+                        ImGui::TableHeadersRow();
 
-			ImGui::EndTabItem();
-		}
+                        for (size_t i = 0; i < pair.second.size(); i++)
+                        {
+                            ImGui::TableNextRow();
 
+                            ImGui::TableSetColumnIndex(0);
+                            ImGui::Text("%d", (int)pair.second[i]->id());
 
-		/* Entity Manager Tab*/
-		if (ImGui::BeginTabItem("Entity Manager"))
-		{
-			if (ImGui::CollapsingHeader("Entities by Tags"))
-			{
-				ImGui::Indent();
-				for (auto e : EntitiesMap)
-				{
-					std::string name = e.first + " Entities";
-					
-					if (ImGui::CollapsingHeader(name.c_str()))
-					{
-						if (e.second.size() != 0) {
-							if (ImGui::BeginTable(e.first.c_str(), 3))
-							{
+                            ImGui::TableSetColumnIndex(1);
+                            ImGui::Text("%s", pair.first.c_str());
 
-								for (size_t i = 0; i < e.second.size(); i++)
-								{
-									ImGui::TableNextRow();
+                            auto& transform = pair.second[i]->get<CTransform>();
 
-									ImGui::TableSetColumnIndex(0);
-									ImGui::Text("%d", e.second[i]->GetId());
+                            ImGui::TableSetColumnIndex(2);
+                            ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
+                        }
 
-									ImGui::TableSetColumnIndex(1);
-									ImGui::Text("%s", e.first.c_str());
+                        ImGui::EndTable();
+                    }
+                }
+            }
+        }
+        ImGui::Unindent();
+    }
+    
+    if (ImGui::CollapsingHeader("All Entities", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::BeginTable("all_entities_table", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+        {
+            ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 50);
+            ImGui::TableSetupColumn("ID");
+            ImGui::TableSetupColumn("Tag");
+            ImGui::TableSetupColumn("Position");
+            ImGui::TableHeadersRow();
 
-									auto pos = e.second[i]->cTransform->Position;
+            for (size_t i = 0; i < entities.size(); i++)
+            {
+                ImGui::TableNextRow();
 
-									ImGui::TableSetColumnIndex(2);
-									ImGui::Text("(%d, %d)", (int)pos.x, (int)pos.y);
-								}
+                ImGui::TableSetColumnIndex(0);
+                std::string btnName = "D##" + std::to_string(entities[i]->id());
+                if (ImGui::Button(btnName.c_str(), ImVec2(40, 0))) {
+                    entities[i]->destroy();
+                }
 
-								ImGui::EndTable();
-							}
-						}
-					}
-				}
-				ImGui::Unindent();
-			}
-			
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%d", (int)entities[i]->id());
 
-			if (ImGui::CollapsingHeader("All Entities"))
-			{
-				if (ImGui::BeginTable("table1", 4))
-				{
-					for (auto e : EntitiesMap)
-					{
-						for (size_t i = 0; i < e.second.size(); i++)
-						{
-							ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%s", entities[i]->tag().c_str());
 
-							ImGui::TableSetColumnIndex(0);
-							std::string btnName = "D";
-							if (ImGui::Button(btnName.c_str(), ImVec2(40, 40))) {
-								e.second[i]->Destroy();
-							}
+                auto& transform = entities[i]->get<CTransform>();
 
-							ImGui::TableSetColumnIndex(1);
-							ImGui::Text("%d", e.second[i]->GetId());
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
+            }
+            ImGui::EndTable();
+        }
+    }
 
-							ImGui::TableSetColumnIndex(2);
-							ImGui::Text("%s", e.first.c_str());
-
-							auto pos = e.second[i]->cTransform->Position;
-
-							ImGui::TableSetColumnIndex(3);
-							ImGui::Text("(%d, %d)", (int)pos.x, (int)pos.y);
-						}
-					}
-					ImGui::EndTable();
-				}
-			}
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
-	}
-	ImGui::End();
+    ImGui::End();
 }
 
 void DebugUI::Render()
 {
-	ImGui::SFML::Render(*Window);
+    ImGui::SFML::Render(*Window);
 }
 
 void DebugUI::ProcessEvent(sf::Event& event)
 {
-	ImGui::SFML::ProcessEvent(*Window, event);
-}
-
-int DebugUI::GetSpawnInterval()
-{
-	return SpawnInterval;
-}
-
-bool DebugUI::GetManuelSpawnFlag()
-{
-	return ManuelSpawnFlag;
+    ImGui::SFML::ProcessEvent(*Window, event);
 }
 
 bool DebugUI::GetAnyItemHovered()
 {
-	return ImGui::IsAnyItemHovered();
+    return ImGui::IsAnyItemHovered();
 }

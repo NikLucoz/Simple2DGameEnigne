@@ -4,6 +4,9 @@ project(SFMLGameEngine)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# --- Define Output Directory Early ---
+set(GAME_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
+
 # --- Dependencies (resolved via vcpkg toolchain) ---
 find_package(SFML 3 COMPONENTS Graphics Window System REQUIRED)
 find_package(ImGui-SFML CONFIG REQUIRED)
@@ -40,5 +43,8 @@ target_link_libraries(game_engine PRIVATE
 
 # --- Output ---
 set_target_properties(game_engine PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)   
+        RUNTIME_OUTPUT_DIRECTORY "${GAME_OUTPUT_DIR}"
+)
+
+# --- Assets ---
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/fonts DESTINATION ${GAME_OUTPUT_DIR})

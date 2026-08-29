@@ -12,4 +12,6 @@ public:
     CTransform() = default;
     CTransform(const Vector2& position, const Vector2& velocity) 
         : position(position), velocity(velocity) {}
+    Vector2 getPosition() const { return position; }
+    Vector2 getVelocity() const { return velocity; }
 };

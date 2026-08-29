@@ -1,38 +1,19 @@
-#pragma once
-#include <SFML/Graphics/Color.hpp>
-#include <variant>
-#include "engine/components/Component.h"
+#include "CShape.h"
 
-class CCircleShape : public Component
+CCircleShape::CCircleShape(float radius, sf::Color fillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
+    : radius(radius), fillColor(fillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
 {
-public:
-    float radius;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CCircleShape() = default;
-    CCircleShape(float radius, sf::Color fillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
-};
+    exists = true;
+}
 
-class CRectangleShape : public Component
+CRectangleShape::CRectangleShape(float width, float height, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
+    : width(width), height(height), fillColor(FillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
 {
-public:
-    float width, height;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CRectangleShape() = default;
-    CRectangleShape(float width, float height, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
-};
+    exists = true;
+}
 
-class CPolygonShape : public Component
+CPolygonShape::CPolygonShape(uint32_t pointCount, float radius, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness)
+    : pointCount(pointCount), radius(radius), fillColor(FillColor), OutlineColor(OutlineColor), OutlineThickness(OutlineThickness)
 {
-public:
-    uint32_t pointCount;
-    float radius;
-    sf::Color fillColor;
-    sf::Color OutlineColor;
-    uint16_t OutlineThickness;
-    CPolygonShape() = default;
-    CPolygonShape(uint32_t pointCount, float radius, sf::Color FillColor, sf::Color OutlineColor, uint16_t OutlineThickness);
-};
+    exists = true;
+}

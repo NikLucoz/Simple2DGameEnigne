@@ -5,6 +5,7 @@ out/
 .idea/
 .vs/
 .vscode/
+build/
 
 # Compiled files
 *.o
@@ -23,3 +24,4 @@ Makefile
 *.user
 *.suo
 *.sln.docstates
+
