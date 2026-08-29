@@ -1,4 +1,6 @@
 #include "Engine.h"
+
+#include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
@@ -18,6 +20,8 @@ bool GameEngine::isOpen() const {
 
 void GameEngine::run() {
     std::cout << "Engine running... (Press ESC to exit)" << std::endl;
+    
+    m_entityManager.addEntity<EPlayer>("player");
     
     while (window.isOpen() && isRunning) {
         float deltaTime = clock.restart().asSeconds();
@@ -96,8 +100,8 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     std::cout << "Mouse pressed at: (" << event.position.x << ", " << event.position.y << ")" << std::endl;
     auto e = m_entityManager.addEntity("test");
-    e->add<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(0,0), 0.0f);
-    e->add<CSprite>(Vec2f(200, 300), Vec2f(0,0), Vec2f(1,1), "game/assets/sprites/Fireball.png");
+    e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(0,0), 0.0f);
+    e->addComponent<CSprite>(Vec2f(200, 300), Vec2f(0,0), Vec2f(1,1), "game/assets/sprites/Fireball.png");
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}

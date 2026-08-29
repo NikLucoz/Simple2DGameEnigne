@@ -9,12 +9,12 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
     for (std::shared_ptr<Entity>& ePtr : entities)
     {
         Entity& e = *ePtr;
-        if (!e.has<CTransform>()) continue;
-        CTransform& transform = e.get<CTransform>();
+        if (!e.hasComponent<CTransform>()) continue;
+        CTransform& transform = e.getComponent<CTransform>();
         
-        if (e.has<CShape>())
+        if (e.hasComponent<CShape>())
         {
-            CShape& shape = e.get<CShape>();
+            CShape& shape = e.getComponent<CShape>();
             sf::CircleShape sfShape(shape.radius_);
             Vec2f pos = transform.getPosition();
             sfShape.setPointCount(shape.point_count_);
@@ -26,9 +26,9 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
             window.draw(sfShape);
         }
         
-        if (e.has<CSprite>())
+        if (e.hasComponent<CSprite>())
         {
-            CSprite& sprite = e.get<CSprite>();
+            CSprite& sprite = e.getComponent<CSprite>();
             if (sprite.m_filepath.empty()) return;
     
             sf::Sprite sfSprite(sprite.getTexture());
@@ -43,7 +43,11 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
             sf::Vector2f finalScale = (calculatedScale * sprite.getScale()).toSFVector2();
             sfSprite.setScale(finalScale);
     
-            sfSprite.setOrigin(sprite.getOrigin().toSFVector2());
+            sf::Vector2f spriteOrigin(
+                textureSize.x / 2.0f,
+                textureSize.y / 2.0f
+            );
+            sfSprite.setOrigin(spriteOrigin);
             sfSprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
             sfSprite.setRotation(sf::degrees(transform.getRotation()));
             window.draw(sfSprite);

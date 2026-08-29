@@ -70,7 +70,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
                             ImGui::TableSetColumnIndex(1);
                             ImGui::Text("%s", pair.first.c_str());
 
-                            auto& transform = pair.second[i]->get<CTransform>();
+                            auto& transform = pair.second[i]->getComponent<CTransform>();
 
                             ImGui::TableSetColumnIndex(2);
                             ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
@@ -110,7 +110,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
                 ImGui::TableSetColumnIndex(2);
                 ImGui::Text("%s", entities[i]->getTag().c_str());
 
-                auto& transform = entities[i]->get<CTransform>();
+                auto& transform = entities[i]->getComponent<CTransform>();
 
                 ImGui::TableSetColumnIndex(3);
                 ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);

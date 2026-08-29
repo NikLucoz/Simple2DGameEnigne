@@ -3,5 +3,5 @@
 CShape::CShape(float radius, int8_t point_count, sf::Color fillColor, sf::Color outlineColor, uint16_t outlineThickness)
     : radius_(radius), point_count_(point_count), fillColor_(fillColor), outlineColor_(outlineColor), outlineThickness_(outlineThickness)
 {
-    active = true;
+    exists = true;
 }

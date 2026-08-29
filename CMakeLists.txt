@@ -34,8 +34,12 @@ add_executable(game_engine ""
         src/engine/components/CShape.h
         src/engine/components/Component.h
         src/engine/utils/math/Vector2.h
-        game/src/Game.h
-        game/src/Game.cpp)
+        game/src/GameManager.h
+        game/src/GameManager.h
+        game/src/GameManager.cpp
+        src/engine/components/CInput.cpp
+        src/engine/components/CInput.h
+)
 set_target_properties(game_engine PROPERTIES OUTPUT_NAME "game_engine")
 set_target_properties(game_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")
 target_include_directories(game_engine PRIVATE

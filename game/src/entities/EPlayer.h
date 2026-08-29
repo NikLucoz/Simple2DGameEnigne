@@ -1,7 +1,13 @@
 #pragma once
+#include "engine/entities/Entity.h"
 
-class EPlayer
+class EPlayer : public Entity
 {
- 
-    public:
+public:
+    EPlayer(const std::string& tag, size_t id) : Entity(tag, id)
+    {
+        addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(0.0f, 0.0f), 0);
+        addComponent<CShape>(40, 6, sf::Color::Red, sf::Color::White, 10);
+        addComponent<CInput>();
+    }
 };

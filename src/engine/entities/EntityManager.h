@@ -16,7 +16,17 @@ class EntityManager
 public: 
     EntityManager();
     void update();
+    
     std::shared_ptr<Entity> addEntity(const std::string& tag);
+    
+    template<typename T>
+    std::shared_ptr<T> addEntity(const std::string& tag)
+    {
+        auto e = std::make_shared<T>(tag, totalEntities_++);
+        toAdd_.push_back(std::static_pointer_cast<Entity>(e));
+        return e;
+    }
+    
     EntityVec& getEntities();
     EntityVec& getEntities(const std::string& tag);
 };

@@ -4,7 +4,7 @@
 #include "engine/entities/EntityManager.h"
 #include "engine/systems/RenderSystem.h"
 
-class Game
+class GameManager
 {
 	sf::Window window_;
 	EntityManager entityManager_;
@@ -15,6 +15,6 @@ class Game
 	
 	void init();
 public:
-	Game() = default;
+	GameManager() = default;
 	void update();
 };

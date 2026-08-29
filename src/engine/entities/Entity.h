@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 
+#include "engine/components/CInput.h"
 #include "engine/components/CShape.h"
 #include "engine/components/CSprite.h"
 #include "engine/components/CTransform.h"
@@ -10,7 +11,8 @@
 using ComponentTuple = std::tuple<
     CTransform,
     CSprite,
-    CShape
+    CShape,
+    CInput
 >;
 
 class Entity
@@ -21,36 +23,38 @@ private:
     std::string tag_ = "default";
     size_t id_ = 0;
 
+protected:
     Entity();
     Entity(const std::string& tag, size_t id);
+
 public:
     
     template <typename T>
-    T& get()
+    T& getComponent()
     {
         return std::get<T>(components_);
     }
 
     template <typename T>
-    bool has()
+    bool hasComponent()
     {
-        return get<T>().active;
+        return getComponent<T>().exists;
     }
 
     template <typename T, typename... TArgs>
-    T& add(TArgs&&... mArgs)
+    T& addComponent(TArgs&&... mArgs)
     {
-        auto& component = get<T>();
+        auto& component = getComponent<T>();
         component = T(std::forward<TArgs>(mArgs)...);
-        component.active = true;
+        component.exists = true;
         return component;
     }
 
     template <typename T>
-    void remove()
+    void removeComponent()
     {
-        get<T>() = T();
-        get<T>().active = false;
+        getComponent<T>() = T();
+        getComponent<T>().exists = false;
     }
 
     size_t getId() const;
