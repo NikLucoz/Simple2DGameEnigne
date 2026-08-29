@@ -51,7 +51,7 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
     
             sfSprite.setOrigin(sprite.getOrigin().toSFVector2());
             sfSprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
-    
+            sfSprite.setRotation(sf::degrees(transform.getRotation()));
             window.draw(sfSprite);
         }
     }
