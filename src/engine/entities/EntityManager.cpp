@@ -6,14 +6,13 @@ EntityManager::EntityManager() = default;
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
 {
-    auto e = std::make_shared<Entity>(tag, m_totalEntities++);
+    auto e = std::shared_ptr<Entity>(new Entity(tag, m_totalEntities++));
     m_toAdd.push_back(e);
     return e;
 }
 
 void EntityManager::update()
 {
-    // add pending entities
     for (auto& e : m_toAdd)
     {
         m_entities.push_back(e);
@@ -21,7 +20,6 @@ void EntityManager::update()
     }
 
     std::vector<std::shared_ptr<Entity>> toRemove;
-    // remove entities listed for destruction
     for (auto& e : m_entities)
     {
         if (e->is_marked_for_destruction() == false) continue;

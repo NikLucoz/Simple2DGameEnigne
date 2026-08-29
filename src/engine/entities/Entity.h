@@ -23,9 +23,9 @@ private:
     std::string m_tag = "default";
     size_t m_id = 0;
 
-public:
     Entity();
     Entity(const std::string& tag, size_t id);
+public:
     
     template <typename T>
     T& get()
@@ -59,5 +59,8 @@ public:
     void destroy();
     const std::string& tag() const;
     bool is_marked_for_destruction() const;
+    
+    // with this only the EntityManager can create Entities since the constructors are private
+    friend class EntityManager;
 };
 
