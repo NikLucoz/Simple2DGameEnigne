@@ -29,7 +29,7 @@ add_packages("sfml", "imgui-sfml")
 -- Copy assets post-build
 -- Copy assets post-build
 after_build(function (target)
-    local src_assets = path.join(target:scriptdir(), "src/assets/*")
-    local dst_assets = path.join(target:targetdir(), "assets/")
+    local src_assets = path.join(target:scriptdir(), "game/assets/*")
+    local dst_assets = path.join(target:targetdir(), "game/assets/")
     os.cp(src_assets, dst_assets)
 end)
