@@ -5,6 +5,7 @@
 
 #include "engine/components/CCircleCollider.h"
 #include "engine/components/CInput.h"
+#include "engine/components/CLifespan.h"
 #include "engine/components/CShape.h"
 #include "engine/components/CSprite.h"
 #include "engine/components/CTransform.h"
@@ -14,7 +15,8 @@ using ComponentTuple = std::tuple<
     CSprite,
     CShape,
     CInput,
-    CCircleCollider
+    CCircleCollider,
+    CLifespan
 >;
 
 class Entity

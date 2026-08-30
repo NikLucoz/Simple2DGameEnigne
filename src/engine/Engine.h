@@ -2,9 +2,9 @@
 #define GAME_ENGINE_HPP
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <engine/entities/EntityManager.h>
 
+#include "systems/LifeSpanSystem.h"
 #include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include "systems/CollisionSystem.h"
@@ -21,6 +21,7 @@ private:
     MovementSystem movementSystem_;
     RenderSystem renderSystem_;
     CollisionSystem collisionSystem_;
+    LifeSpanSystem lifeSpanSystem_;
     DebugUI debugUI_;
     std::shared_ptr<EPlayer> player_ = nullptr;
 public:

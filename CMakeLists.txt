@@ -24,24 +24,7 @@ endif()
 
 # target
 add_executable(game_engine ""
-        src/engine/entities/Entity.h
-        src/engine/systems/RenderSystem.h
-        src/engine/Engine.h
-        src/main.h
-        src/engine/components/CTransform.h
-        src/engine/entities/EntityManager.h
-        src/engine/components/CSprite.h
-        src/engine/components/CShape.h
-        src/engine/components/Component.h
-        src/engine/utils/math/Vector2.h
-        game/src/GameManager.h
-        game/src/GameManager.h
-        game/src/GameManager.cpp
-        src/engine/components/CInput.cpp
-        src/engine/components/CInput.h
-        src/engine/systems/MovementSystem.cpp
-        src/engine/systems/MovementSystem.h
-)
+        src/engine/systems/MovementSystem.cpp)
 set_target_properties(game_engine PROPERTIES OUTPUT_NAME "game_engine")
 set_target_properties(game_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")
 target_include_directories(game_engine PRIVATE
@@ -150,11 +133,16 @@ target_sources(game_engine PRIVATE
     src/main.cpp
     src/engine/entities/Entity.cpp
     src/engine/entities/EntityManager.cpp
-    src/engine/components/CShape.cpp
     src/engine/components/CSprite.cpp
+    src/engine/components/CShape.cpp
+    src/engine/components/CInput.cpp
     src/engine/utils/math/Vector2.cpp
     src/engine/utils/debug_ui/DebugUI.cpp
+    src/engine/utils/random.cpp
     src/engine/systems/RenderSystem.cpp
+    src/engine/systems/MovementSystem.cpp
+    src/engine/systems/CollisionSystem.cpp
+    src/engine/systems/LifeSpanSystem.cpp
     src/engine/Engine.cpp
 )
 

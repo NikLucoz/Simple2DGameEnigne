@@ -1,5 +1,7 @@
 #include "Engine.h"
 
+#include <iostream>
+
 #include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include <SFML/System/Vector2.hpp>
@@ -44,6 +46,7 @@ void GameEngine::update(float deltaTime) {
     entityManager_.update();
     movementSystem_.update(player_.get(), entityManager_, deltaTime);
     collisionSystem_.update(entityManager_, window_.getSize(), deltaTime);
+    lifeSpanSystem_.update(entityManager_, deltaTime);
     debugUI_.Update(clock_, entityManager_.getEntities());
 }
 
@@ -134,8 +137,8 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     
     auto e = entityManager_.addEntity("enemy");
-    e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0.0f);
-    e->addComponent<CShape>(40, 12, sf::Color::Blue, sf::Color::White, 10);
+    e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0);
+    e->addComponent<CShape>(40, 6, sf::Color::Blue, sf::Color::White, 10);
     e->addComponent<CCircleCollider>(50);
     
 }

@@ -23,7 +23,14 @@ void MovementSystem::update(EPlayer* player, EntityManager& entity_manager, floa
     for (auto& e : enemies)
     {
         auto& transform = e->getComponent<CTransform>();
-        // generate random dir
+        transform.position.y += transform.velocity.y * deltaTime;
+        transform.position.x += transform.velocity.x * deltaTime;
+    }
+    
+    auto& enemieParticles = entity_manager.getEntities("enemyParticle");
+    for (auto& e : enemieParticles)
+    {
+        auto& transform = e->getComponent<CTransform>();
         transform.position.y += transform.velocity.y * deltaTime;
         transform.position.x += transform.velocity.x * deltaTime;
     }

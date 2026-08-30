@@ -15,15 +15,15 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
         
         if (e.hasComponent<CShape>())
         {
-            CShape& shape = e.getComponent<CShape>();
-            sf::CircleShape sfShape(shape.radius_);
-            sfShape.setPointCount(shape.point_count_);
-            sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
-            sfShape.setOrigin({shape.radius_, shape.radius_});
-            sfShape.setFillColor(shape.fillColor_);
-            sfShape.setOutlineColor(shape.outlineColor_);
-            sfShape.setOutlineThickness(shape.outlineThickness_);
-            window.draw(sfShape);
+            CShape& cShape = e.getComponent<CShape>();
+            cShape.getShape()->setPointCount(cShape.point_count_);
+            cShape.getShape()->setPosition(sf::Vector2f(pos.x, pos.y));
+            cShape.getShape()->setRotation(sf::degrees(transform.getRotation()));
+            cShape.getShape()->setOrigin({cShape.radius_, cShape.radius_});
+            cShape.getShape()->setFillColor(cShape.fillColor_);
+            cShape.getShape()->setOutlineColor(cShape.outlineColor_);
+            cShape.getShape()->setOutlineThickness(cShape.outlineThickness_);
+            window.draw(*cShape.getShape());
         }
         
         if (e.hasComponent<CSprite>())
