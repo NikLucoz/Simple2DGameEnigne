@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "engine/utils/math/Vector2.h"
 
 class CInput : public Component
 {
@@ -12,4 +13,6 @@ public:
     bool bMouseRight = false;
     
     CInput() = default;
+    bool hasMovementInput() const;
+    Vector2<int> getMovementDirection() const;
 };

@@ -5,18 +5,32 @@
 #include <iostream>
 #include <engine/entities/EntityManager.h>
 
+#include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
+#include "systems/MovementSystem.h"
 #include "systems/RenderSystem.h"
+
+struct PlayerInput
+{
+        
+};
+
+struct GameData
+{
+    PlayerInput playerInput_;
+};
 
 class GameEngine {
 private:
-    sf::RenderWindow window;
-    sf::Clock clock;
-    bool isRunning;
-    EntityManager m_entityManager;
-    RenderSystem m_renderSystem;
-    DebugUI m_debugUI;
-
+    sf::RenderWindow window_;
+    sf::Clock clock_;
+    bool bIsRunning_;
+    
+    EntityManager entityManager_;
+    MovementSystem movementSystem_;
+    RenderSystem renderSystem_;
+    DebugUI debugUI_;
+    std::shared_ptr<EPlayer> player_;    
 public:
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
     ~GameEngine();
@@ -45,4 +59,4 @@ private:
     void drawTestGrid();
 };
 
-#endif // GAME_ENGINE_HPP
+#endif
