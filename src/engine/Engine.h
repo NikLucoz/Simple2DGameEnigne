@@ -7,18 +7,9 @@
 
 #include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
+#include "systems/CollisionSystem.h"
 #include "systems/MovementSystem.h"
 #include "systems/RenderSystem.h"
-
-struct PlayerInput
-{
-        
-};
-
-struct GameData
-{
-    PlayerInput playerInput_;
-};
 
 class GameEngine {
 private:
@@ -29,8 +20,9 @@ private:
     EntityManager entityManager_;
     MovementSystem movementSystem_;
     RenderSystem renderSystem_;
+    CollisionSystem collisionSystem_;
     DebugUI debugUI_;
-    std::shared_ptr<EPlayer> player_;    
+    std::shared_ptr<EPlayer> player_ = nullptr;
 public:
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
     ~GameEngine();

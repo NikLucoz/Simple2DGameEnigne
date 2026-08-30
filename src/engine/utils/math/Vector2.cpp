@@ -81,6 +81,14 @@ sf::Vector2<T> Vector2<T>::toSFVector2() const
     return sf::Vector2<T>(this->x, this->y);
 }
 
+template <typename T>
+float Vector2<T>::distanceTo(const Vector2<T> other) const
+{
+    float dx = x - other.x;
+    float dy = y - other.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
 // Explicit instantiations (add these at the end)
 template class Vector2<float>;
 template class Vector2<int>;

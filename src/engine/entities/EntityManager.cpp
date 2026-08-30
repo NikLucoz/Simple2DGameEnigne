@@ -29,7 +29,19 @@ void EntityManager::update()
     for (auto& e : toRemove)
     {
         auto it = std::find(entities_.begin(), entities_.end(), e);
-        entities_.erase(it);
+        if (it != entities_.end()) {
+            entities_.erase(it);
+        }
+    
+        auto& taggedEntities = entitiesMap_[e->getTag()];
+        auto it2 = std::find(taggedEntities.begin(), taggedEntities.end(), e);
+        if (it2 != taggedEntities.end()) {
+            taggedEntities.erase(it2);
+        }
+    
+        if (entitiesMap_[e->getTag()].empty()) {
+            entitiesMap_.erase(e->getTag());
+        }
     }
     
     toAdd_.clear();

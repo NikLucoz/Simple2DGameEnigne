@@ -39,6 +39,8 @@ add_executable(game_engine ""
         game/src/GameManager.cpp
         src/engine/components/CInput.cpp
         src/engine/components/CInput.h
+        src/engine/systems/MovementSystem.cpp
+        src/engine/systems/MovementSystem.h
 )
 set_target_properties(game_engine PROPERTIES OUTPUT_NAME "game_engine")
 set_target_properties(game_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")

@@ -2,9 +2,8 @@
 
 #include <iostream>
 #include <SFML/Graphics/Transform.hpp>
-
 #include "engine/entities/EntityManager.h"
-
+#include "../../../game/src/entities/EPlayer.h"
 
 void MovementSystem::update(EPlayer* player, EntityManager& entity_manager, float deltaTime)
 {

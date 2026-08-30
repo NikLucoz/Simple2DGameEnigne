@@ -2,8 +2,10 @@
 
 #include "../../game/src/entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
+#include <SFML/System/Vector2.hpp>
 
-GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title) : window_(sf::VideoMode({width, height}), title), bIsRunning_(true) {
+GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title) 
+    : window_(sf::VideoMode({width, height}), title), bIsRunning_(true) {
     window_.setFramerateLimit(60);
     debugUI_.Init(window_);
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
@@ -21,6 +23,7 @@ void GameEngine::run() {
     std::cout << "Engine running... (Press ESC to exit)" << std::endl;
     
     player_ = entityManager_.addEntity<EPlayer>("player");
+    player_->getComponent<CTransform>().position = Vec2f(window_.getSize().x / 2, window_.getSize().y / 2);
     
     while (window_.isOpen() && bIsRunning_) {
         float deltaTime = clock_.restart().asSeconds();
@@ -40,6 +43,7 @@ void GameEngine::update(float deltaTime) {
     handleEvents();
     entityManager_.update();
     movementSystem_.update(player_.get(), entityManager_, deltaTime);
+    collisionSystem_.update(entityManager_, window_.getSize(), deltaTime);
     debugUI_.Update(clock_, entityManager_.getEntities());
 }
 
@@ -132,6 +136,7 @@ void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     auto e = entityManager_.addEntity("enemy");
     e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0.0f);
     e->addComponent<CShape>(40, 12, sf::Color::Blue, sf::Color::White, 10);
+    e->addComponent<CCircleCollider>(50);
     
 }
 

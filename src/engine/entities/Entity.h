@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 
+#include "engine/components/CCircleCollider.h"
 #include "engine/components/CInput.h"
 #include "engine/components/CShape.h"
 #include "engine/components/CSprite.h"
@@ -12,7 +13,8 @@ using ComponentTuple = std::tuple<
     CTransform,
     CSprite,
     CShape,
-    CInput
+    CInput,
+    CCircleCollider
 >;
 
 class Entity

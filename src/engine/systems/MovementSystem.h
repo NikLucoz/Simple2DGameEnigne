@@ -1,6 +1,7 @@
 #pragma once
-#include "../../../game/src/entities/EPlayer.h"
-#include "../entities/EntityManager.h"
+
+class EPlayer;
+class EntityManager;
 
 class MovementSystem
 {

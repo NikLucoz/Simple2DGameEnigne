@@ -11,12 +11,12 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
         Entity& e = *ePtr;
         if (!e.hasComponent<CTransform>()) continue;
         CTransform& transform = e.getComponent<CTransform>();
+        Vec2f pos = transform.getPosition();
         
         if (e.hasComponent<CShape>())
         {
             CShape& shape = e.getComponent<CShape>();
             sf::CircleShape sfShape(shape.radius_);
-            Vec2f pos = transform.getPosition();
             sfShape.setPointCount(shape.point_count_);
             sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
             sfShape.setOrigin({shape.radius_, shape.radius_});
@@ -51,6 +51,20 @@ void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<
             sfSprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
             sfSprite.setRotation(sf::degrees(transform.getRotation()));
             window.draw(sfSprite);
+        }
+        
+        if (e.hasComponent<CCircleCollider>())
+        {
+            CCircleCollider& c = e.getComponent<CCircleCollider>();
+            sf::CircleShape sfShape(c.radius_);
+            sfShape.setPointCount(20);
+            sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
+            sfShape.setOrigin({c.radius_, c.radius_});
+            sfShape.setFillColor(sf::Color::Transparent);
+            sfShape.setOutlineColor(sf::Color::Green);
+            sfShape.setOutlineThickness(2);
+            window.draw(sfShape);
+            
         }
     }
 }

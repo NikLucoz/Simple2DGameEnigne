@@ -22,6 +22,7 @@ public:
     T normalize();
     T angle() const;
     sf::Vector2<T> toSFVector2() const;
+    float distanceTo(const Vector2<T> vector2) const;
 };
 
 using Vec2f = Vector2<float>;
