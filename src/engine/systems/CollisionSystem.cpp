@@ -32,8 +32,10 @@ void CollisionSystem::update(EntityManager& entity_manager, sf::Vector2u windowS
                 for (int i = 0; i < cShape.point_count_; ++i)
                 {
                     float angle = i * angleStep;
-                    auto velX = std::cosf(angle) * 300;
-                    auto velY = -1 * std::sinf(angle) * 300;
+                    angle += angleStep/2;
+                    float radiandAngles = sf::degrees(angle).asRadians();
+                    auto velX = std::cosf(radiandAngles) * 300;
+                    auto velY = -1 * std::sinf(radiandAngles) * 300;\
 
                     std::shared_ptr<Entity> enemyParticle = entity_manager.addEntity("enemyParticle");
                     enemyParticle->addComponent<CShape>(10, cShape.point_count_, cShape.fillColor_, cShape.outlineColor_, 2);

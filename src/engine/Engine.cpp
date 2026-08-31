@@ -135,12 +135,10 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
-    
     auto e = entityManager_.addEntity("enemy");
     e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0);
-    e->addComponent<CShape>(40, 6, sf::Color::Blue, sf::Color::White, 10);
+    e->addComponent<CShape>(40, 5, sf::Color::Blue, sf::Color::White, 10);
     e->addComponent<CCircleCollider>(50);
-    
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}
