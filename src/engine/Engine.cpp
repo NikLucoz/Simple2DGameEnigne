@@ -49,7 +49,7 @@ void GameEngine::update(float deltaTime) {
     EntityManager::getInstance().update();
     MovementSystem::getInstance().update(player_.get(), deltaTime);
     CollisionSystem::getInstance().update(window_.getSize(), deltaTime);
-    EnemySpawnSystem::getInstance().update(deltaTime);
+    EnemySpawnSystem::getInstance().update(deltaTime, window_);
     LifeSpanSystem::getInstance().update(deltaTime);
     debugUI_.Update(clock_, EntityManager::getInstance().getEntities());
 }
@@ -139,10 +139,7 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
-    auto e = EntityManager::getInstance().addEntity("enemy");
-    e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0);
-    e->addComponent<CShape>(40, 5, sf::Color::Blue, sf::Color::White, 10);
-    e->addComponent<CCircleCollider>(50);
+
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}

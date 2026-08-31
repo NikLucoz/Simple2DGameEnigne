@@ -62,19 +62,22 @@ void RenderSystem::update(sf::RenderWindow& window, float deltaTime)
             sfSprite.setRotation(sf::degrees(transform.getRotation()));
             window.draw(sfSprite);
         }
-        
-        if (e.hasComponent<CCircleCollider>())
+
+        if (bDrawDebug_)
         {
-            CCircleCollider& c = e.getComponent<CCircleCollider>();
-            sf::CircleShape sfShape(c.radius_);
-            sfShape.setPointCount(20);
-            sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
-            sfShape.setOrigin({c.radius_, c.radius_});
-            sfShape.setFillColor(sf::Color::Transparent);
-            sfShape.setOutlineColor(sf::Color::Green);
-            sfShape.setOutlineThickness(2);
-            window.draw(sfShape);
-            
+            if (e.hasComponent<CCircleCollider>())
+            {
+                CCircleCollider& c = e.getComponent<CCircleCollider>();
+                sf::CircleShape sfShape(c.radius_);
+                sfShape.setPointCount(20);
+                sfShape.setPosition(sf::Vector2f(pos.x, pos.y));
+                sfShape.setOrigin({c.radius_, c.radius_});
+                sfShape.setFillColor(sf::Color::Transparent);
+                sfShape.setOutlineColor(sf::Color::Green);
+                sfShape.setOutlineThickness(2);
+                window.draw(sfShape);
+
+            }
         }
     }
 }

@@ -41,22 +41,29 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
         // --------------------------------------------------
         if (ImGui::BeginTabItem("System"))
         {
-            ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-            ImGui::Text("Total Entities: %zu", entities.size());
-
             bool isMovementActive = MovementSystem::getInstance().bIsActive_;
             if (ImGui::Checkbox("Movement System", &isMovementActive)) {
                 MovementSystem::getInstance().bIsActive_ = isMovementActive;
             }
 
-            bool isRenderActive = RenderSystem::getInstance().bIsActive_;
-            if (ImGui::Checkbox("Render System", &isRenderActive)) {
-                RenderSystem::getInstance().bIsActive_ = isRenderActive;
-            }
-
             bool isCollisionActive = CollisionSystem::getInstance().bIsActive_;
             if (ImGui::Checkbox("Collision System", &isCollisionActive)) {
                 CollisionSystem::getInstance().bIsActive_ = isCollisionActive;
+            }
+
+            if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Indent();
+                bool isRenderActive = RenderSystem::getInstance().bIsActive_;
+                if (ImGui::Checkbox("Render System", &isRenderActive)) {
+                    RenderSystem::getInstance().bIsActive_ = isRenderActive;
+                }
+
+                bool shouldRenderDebug = RenderSystem::getInstance().bDrawDebug_;
+                if (ImGui::Checkbox("Show debug", &shouldRenderDebug)) {
+                    RenderSystem::getInstance().bDrawDebug_ = shouldRenderDebug;
+                }
+                ImGui::Unindent();
             }
 
             bool isLifespanActive = LifeSpanSystem::getInstance().bIsActive_;
