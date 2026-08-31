@@ -4,9 +4,19 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-void RenderSystem::update(sf::RenderWindow& window, std::vector<std::shared_ptr<Entity>> entities, float deltaTime)
+#include "../entities/EntityManager.h"
+
+RenderSystem& RenderSystem::getInstance()
 {
-    for (std::shared_ptr<Entity>& ePtr : entities)
+    static RenderSystem renderSystem;
+    return renderSystem;
+}
+
+void RenderSystem::update(sf::RenderWindow& window, float deltaTime)
+{
+    if (!bIsActive_) return;
+
+    for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
     {
         Entity& e = *ePtr;
         if (!e.hasComponent<CTransform>()) continue;

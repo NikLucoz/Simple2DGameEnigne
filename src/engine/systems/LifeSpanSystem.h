@@ -4,6 +4,9 @@ class EntityManager;
 
 class LifeSpanSystem
 {
+    LifeSpanSystem() = default;
 public:
-  void update(EntityManager entity_manager, double delta_time);  
+    bool bIsActive_ = true;
+    static LifeSpanSystem& getInstance();
+    void update(double delta_time);
 };

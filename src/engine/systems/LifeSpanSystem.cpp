@@ -4,9 +4,17 @@
 
 #include "engine/entities/EntityManager.h"
 
-void LifeSpanSystem::update(EntityManager entityManager, double deltaTime)
+LifeSpanSystem& LifeSpanSystem::getInstance()
 {
-    auto& entities = entityManager.getEntities();
+    static LifeSpanSystem instance;
+    return instance;
+}
+
+void LifeSpanSystem::update(double deltaTime)
+{
+    if (!bIsActive_) return;
+
+    auto& entities = EntityManager::getInstance().getEntities();
     
     for (auto& entity : entities)
     {

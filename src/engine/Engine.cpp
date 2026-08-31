@@ -1,10 +1,13 @@
 #include "Engine.h"
-
 #include <iostream>
-
-#include "../../game/src/entities/EPlayer.h"
+#include "entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include <SFML/System/Vector2.hpp>
+#include "systems/EnemySpawnSystem.h"
+#include "systems/CollisionSystem.h"
+#include "systems/LifeSpanSystem.h"
+#include "systems/MovementSystem.h"
+#include "systems/RenderSystem.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title) 
     : window_(sf::VideoMode({width, height}), title), bIsRunning_(true) {
@@ -24,7 +27,7 @@ bool GameEngine::isOpen() const {
 void GameEngine::run() {
     std::cout << "Engine running... (Press ESC to exit)" << std::endl;
     
-    player_ = entityManager_.addEntity<EPlayer>("player");
+    player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
     player_->getComponent<CTransform>().position = Vec2f(window_.getSize().x / 2, window_.getSize().y / 2);
     
     while (window_.isOpen() && bIsRunning_) {
@@ -43,18 +46,19 @@ void GameEngine::run() {
 
 void GameEngine::update(float deltaTime) {
     handleEvents();
-    entityManager_.update();
-    movementSystem_.update(player_.get(), entityManager_, deltaTime);
-    collisionSystem_.update(entityManager_, window_.getSize(), deltaTime);
-    lifeSpanSystem_.update(entityManager_, deltaTime);
-    debugUI_.Update(clock_, entityManager_.getEntities());
+    EntityManager::getInstance().update();
+    MovementSystem::getInstance().update(player_.get(), deltaTime);
+    CollisionSystem::getInstance().update(window_.getSize(), deltaTime);
+    EnemySpawnSystem::getInstance().update(deltaTime);
+    LifeSpanSystem::getInstance().update(deltaTime);
+    debugUI_.Update(clock_, EntityManager::getInstance().getEntities());
 }
 
 void GameEngine::render(float deltaTime) {
     window_.clear(sf::Color::Black);
     
     drawTestGrid();
-    renderSystem_.update(window_, entityManager_.getEntities(), deltaTime);
+    RenderSystem::getInstance().update(window_, deltaTime);
     debugUI_.Render();
     window_.display();
 }
@@ -135,7 +139,7 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
-    auto e = entityManager_.addEntity("enemy");
+    auto e = EntityManager::getInstance().addEntity("enemy");
     e->addComponent<CTransform>(Vec2f{static_cast<float>(event.position.x), static_cast<float>(event.position.y)}, Vec2f(300.0f, 300.0f), 0);
     e->addComponent<CShape>(40, 5, sf::Color::Blue, sf::Color::White, 10);
     e->addComponent<CCircleCollider>(50);

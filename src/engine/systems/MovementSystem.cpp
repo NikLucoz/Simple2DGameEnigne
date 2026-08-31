@@ -3,10 +3,18 @@
 #include <iostream>
 #include <SFML/Graphics/Transform.hpp>
 #include "engine/entities/EntityManager.h"
-#include "../../../game/src/entities/EPlayer.h"
+#include "../entities/EPlayer.h"
 
-void MovementSystem::update(EPlayer* player, EntityManager& entity_manager, float deltaTime)
+MovementSystem& MovementSystem::getInstance()
 {
+    static MovementSystem instance;
+    return instance;
+}
+
+void MovementSystem::update(EPlayer* player, float deltaTime)
+{
+    if (!bIsActive_) return;
+
     if (player != nullptr)
     {
         auto& input = player->getComponent<CInput>();
@@ -19,16 +27,8 @@ void MovementSystem::update(EPlayer* player, EntityManager& entity_manager, floa
         }
     }
     
-    auto& enemies = entity_manager.getEntities("enemy");
+    auto& enemies = EntityManager::getInstance().getEntities("enemy");
     for (auto& e : enemies)
-    {
-        auto& transform = e->getComponent<CTransform>();
-        transform.position.y += transform.velocity.y * deltaTime;
-        transform.position.x += transform.velocity.x * deltaTime;
-    }
-    
-    auto& enemieParticles = entity_manager.getEntities("enemyParticle");
-    for (auto& e : enemieParticles)
     {
         auto& transform = e->getComponent<CTransform>();
         transform.position.y += transform.velocity.y * deltaTime;

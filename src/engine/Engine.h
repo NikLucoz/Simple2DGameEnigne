@@ -2,26 +2,15 @@
 #define GAME_ENGINE_HPP
 
 #include <SFML/Graphics.hpp>
-#include <engine/entities/EntityManager.h>
-
-#include "systems/LifeSpanSystem.h"
-#include "../../game/src/entities/EPlayer.h"
+#include "entities/EntityManager.h"
+#include "entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
-#include "systems/CollisionSystem.h"
-#include "systems/MovementSystem.h"
-#include "systems/RenderSystem.h"
 
 class GameEngine {
 private:
     sf::RenderWindow window_;
     sf::Clock clock_;
     bool bIsRunning_;
-    
-    EntityManager entityManager_;
-    MovementSystem movementSystem_;
-    RenderSystem renderSystem_;
-    CollisionSystem collisionSystem_;
-    LifeSpanSystem lifeSpanSystem_;
     DebugUI debugUI_;
     std::shared_ptr<EPlayer> player_ = nullptr;
 public:

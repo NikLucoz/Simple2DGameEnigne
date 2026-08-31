@@ -2,7 +2,11 @@
 
 #include <algorithm>
 
-EntityManager::EntityManager() = default;
+EntityManager& EntityManager::getInstance()
+{
+    static EntityManager instance;
+    return instance;
+}
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
 {

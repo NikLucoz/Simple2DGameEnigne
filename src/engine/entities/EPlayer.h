@@ -1,6 +1,5 @@
 #pragma once
-#include "engine/entities/Entity.h"
-
+#include "Entity.h"
 
 class EPlayer : public Entity
 {

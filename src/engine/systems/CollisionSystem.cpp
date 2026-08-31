@@ -1,14 +1,24 @@
 #include "CollisionSystem.h"
-#include "../../../game/src/entities/EPlayer.h"
+#include "../entities/EPlayer.h"
 #include "engine/components/CCircleCollider.h"
 #include "engine/entities/EntityManager.h"
 #include <SFML/System/Vector2.hpp>
-#include <iostream>
+
+#include "EnemySpawnSystem.h"
+
 class CCircleCollider;
-void CollisionSystem::update(EntityManager& entity_manager, sf::Vector2u windowSize, float deltaTime)
+
+CollisionSystem& CollisionSystem::getInstance()
 {
-    auto& enemies = entity_manager.getEntities("enemy");
-    auto players = entity_manager.getEntities("player");
+    static CollisionSystem instance;
+    return instance;
+}
+
+void CollisionSystem::update(sf::Vector2u windowSize, float deltaTime)
+{
+    if (!bIsActive_) return;
+    auto& enemies = EntityManager::getInstance().getEntities("enemy");
+    auto players = EntityManager::getInstance().getEntities("player");
     
     if (players.empty()) return;
     
@@ -18,31 +28,14 @@ void CollisionSystem::update(EntityManager& entity_manager, sf::Vector2u windowS
     
     for (auto& enemy : enemies)
     {
+        if (!enemy->hasComponent<CCircleCollider>()) continue;
         auto& eTransform = enemy->getComponent<CTransform>();
         auto& eCollider = enemy->getComponent<CCircleCollider>();
-        
+
         float distanceToPlayer = eTransform.getPosition().distanceToSquared(pTransform.getPosition());
         if (distanceToPlayer < (eCollider.radius_ + pCollider.radius_) * (eCollider.radius_ + pCollider.radius_))
         {
-            if (enemy->hasComponent<CShape>())
-            {
-                auto& cShape = enemy->getComponent<CShape>();
-                
-                float angleStep = 360.0f / cShape.point_count_;
-                for (int i = 0; i < cShape.point_count_; ++i)
-                {
-                    float angle = i * angleStep;
-                    angle += angleStep/2;
-                    float radiandAngles = sf::degrees(angle).asRadians();
-                    auto velX = std::cosf(radiandAngles) * 300;
-                    auto velY = -1 * std::sinf(radiandAngles) * 300;\
-
-                    std::shared_ptr<Entity> enemyParticle = entity_manager.addEntity("enemyParticle");
-                    enemyParticle->addComponent<CShape>(10, cShape.point_count_, cShape.fillColor_, cShape.outlineColor_, 2);
-                    enemyParticle->addComponent<CLifespan>(0.4);
-                    enemyParticle->addComponent<CTransform>(eTransform.getPosition(), Vec2f(velX, velY), eTransform.getRotation());
-                }
-            }
+            EnemySpawnSystem::getInstance().spawnEnemyDeathParticle(enemy.get());
             enemy->destroy();
         }
         

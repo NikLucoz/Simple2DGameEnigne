@@ -10,16 +10,17 @@ using EntityVec = std::vector<std::shared_ptr<Entity>>;
 using EntityMap = std::map<std::string, EntityVec>;
 class EntityManager
 {
+private:
     EntityVec entities_;
     EntityMap entitiesMap_;
     EntityVec toAdd_;
     size_t totalEntities_ = 0;
-public: 
-    EntityManager();
+    EntityManager() = default;
+public:
+    static EntityManager& getInstance();
     void update();
-    
     std::shared_ptr<Entity> addEntity(const std::string& tag);
-    
+
     template<typename T>
     std::shared_ptr<T> addEntity(const std::string& tag)
     {

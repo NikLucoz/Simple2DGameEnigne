@@ -5,6 +5,9 @@ class EntityManager;
 
 class MovementSystem
 {
+    MovementSystem() = default;
 public:
-    void update(EPlayer* player, EntityManager& entity_manager, float deltaTime);
+    bool bIsActive_ = true;
+    static MovementSystem& getInstance();
+    void update(EPlayer* player, float deltaTime);
 };

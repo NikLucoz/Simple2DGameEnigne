@@ -1,11 +1,15 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 
+class EnemySpawnSystem;
 class EntityManager;
 
 class CollisionSystem
 {
 public:
-    void update(EntityManager& entity_manager, sf::Vector2u windowSize, float deltaTime);
-    
+    static CollisionSystem& getInstance();
+    bool bIsActive_ = true;
+    void update(sf::Vector2u windowSize, float deltaTime);
+private:
+    CollisionSystem() = default;
 };
