@@ -166,6 +166,7 @@ PYTHONPATH=C:\Users\lucoz\AppData\Local\.xmake\packages\p\python\3.14.3\a5aba9c0
     <ClInclude Include="$(XmakeProjectDir)\src\engine\systems\RenderSystem.h" />
     <ClInclude Include="$(XmakeProjectDir)\src\engine\utils\debug_ui\DebugUI.h" />
     <ClInclude Include="$(XmakeProjectDir)\src\engine\utils\math\Vector2.h" />
+    <ClInclude Include="..\..\src\engine\components\CSpecialBullet.h" />
     <ClInclude Include="..\..\src\engine\systems\ScoreSystem.h" />
 
 
@@ -217,6 +218,7 @@ PYTHONPATH=C:\Users\lucoz\AppData\Local\.xmake\packages\p\python\3.14.3\a5aba9c0
     <ClCompile Include="$(XmakeProjectDir)\src\main.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\src\engine\components\CSpecialBullet.cpp" />
     <ClCompile Include="..\..\src\engine\systems\ScoreSystem.cpp" />
 
 

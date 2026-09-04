@@ -1,4 +1,6 @@
 #pragma once
+#include <type_traits>
+#include <SFML/System/Clock.hpp>
 
 class EPlayer;
 class EntityManager;
@@ -9,5 +11,5 @@ class MovementSystem
 public:
     bool bIsActive_ = true;
     static MovementSystem& getInstance();
-    void update(EPlayer* player, float deltaTime);
+    void update(EPlayer* get, float delta_time, sf::Clock clock);
 };

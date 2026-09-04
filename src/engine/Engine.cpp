@@ -5,6 +5,8 @@
 #include "entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include <SFML/System/Vector2.hpp>
+
+#include "components/CSpecialBullet.h"
 #include "systems/EnemySpawnSystem.h"
 #include "systems/CollisionSystem.h"
 #include "systems/LifeSpanSystem.h"
@@ -60,7 +62,7 @@ void GameEngine::run() {
 void GameEngine::update(float deltaTime) {
     handleEvents();
     EntityManager::getInstance().update();
-    MovementSystem::getInstance().update(player_.get(), deltaTime);
+    MovementSystem::getInstance().update(player_.get(), deltaTime, clock_);
     CollisionSystem::getInstance().update(window_.getSize(), deltaTime);
     EnemySpawnSystem::getInstance().update(deltaTime, window_);
     LifeSpanSystem::getInstance().update(deltaTime);
@@ -155,17 +157,43 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
     if (debugUI_.GetAnyItemHovered()) return;
-
-    sf::Vector2i mousePos = sf::Mouse::getPosition(window_);
     Entity* player = EntityManager::getInstance().getEntities("player").front().get();
     CTransform playerTransform = player->getComponent<CTransform>();
-    Vec2f shootDirection = Vec2f(mousePos.x, mousePos.y) - playerTransform.getPosition();
     
-    auto e = EntityManager::getInstance().addEntity("bullet");
-    e->addComponent<CTransform>(playerTransform.getPosition(), shootDirection.normalized() * 700, 0);
-    e->addComponent<CShape>(12, 20, sf::Color::White, sf::Color::White, 0);
-    e->addComponent<CCircleCollider>(12);
-    e->addComponent<CLifespan>(6);
+    if (event.button == sf::Mouse::Button::Left)
+    {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window_);
+        Vec2f shootDirection = Vec2f(mousePos.x, mousePos.y) - playerTransform.getPosition();
+        
+        auto e = EntityManager::getInstance().addEntity("bullet");
+        e->addComponent<CTransform>(playerTransform.getPosition(), shootDirection.normalized() * 700, 0);
+        e->addComponent<CShape>(12, 20, sf::Color::White, sf::Color::White, 0);
+        e->addComponent<CCircleCollider>(12);
+        e->addComponent<CLifespan>(6);
+    }
+    
+    if (event.button == sf::Mouse::Button::Right)
+    {
+        float directions[4][2] = {
+            {0.35f, -0.35f},
+            {0.35f, 0.35f},
+            {-0.35f, -0.35f},
+            {-0.35f, 0.35f}
+        };
+        
+        for (auto i = 0; i < 4; i++)
+        {
+            float dx = directions[i][0];
+            float dy = directions[i][1];
+            
+            auto e = EntityManager::getInstance().addEntity("specialBullet");
+            e->addComponent<CTransform>(playerTransform.getPosition(), Vec2f(dx,dy) * 300, 0);
+            e->addComponent<CShape>(12, 20, sf::Color::White, sf::Color::White, 0);
+            e->addComponent<CCircleCollider>(12);
+            e->addComponent<CLifespan>(6);
+            e->addComponent<CSpecialBullet>();
+        }
+    }
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseMoved& event)

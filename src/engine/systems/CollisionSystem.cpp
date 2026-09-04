@@ -20,7 +20,8 @@ void CollisionSystem::update(sf::Vector2u windowSize, float deltaTime)
     if (!bIsActive_) return;
     auto& enemies = EntityManager::getInstance().getEntities("enemy");
     auto players = EntityManager::getInstance().getEntities("player");
-    auto bullets = EntityManager::getInstance().getEntities("bullet");
+    std::vector<std::string> tags{"bullet", "specialBullet"};
+    auto bullets = EntityManager::getInstance().getEntities(tags);
     
     if (players.empty()) return;
     
