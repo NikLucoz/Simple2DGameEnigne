@@ -13,6 +13,9 @@ private:
     bool bIsRunning_;
     DebugUI debugUI_;
     std::shared_ptr<EPlayer> player_ = nullptr;
+    
+    sf::Font font_;
+    sf::Text scoreText;
 public:
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
     ~GameEngine();

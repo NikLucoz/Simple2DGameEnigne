@@ -1,4 +1,6 @@
 #include "Engine.h"
+
+#include <imgui.h>
 #include <iostream>
 #include "entities/EPlayer.h"
 #include "engine/utils/debug_ui/DebugUI.h"
@@ -8,9 +10,11 @@
 #include "systems/LifeSpanSystem.h"
 #include "systems/MovementSystem.h"
 #include "systems/RenderSystem.h"
+#include "systems/ScoreSystem.h"
 
-GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title) 
-    : window_(sf::VideoMode({width, height}), title), bIsRunning_(true) {
+GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
+    : window_(sf::VideoMode({width, height}), title), bIsRunning_(true), scoreText(font_)
+{
     window_.setFramerateLimit(60);
     debugUI_.Init(window_);
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
@@ -27,8 +31,17 @@ bool GameEngine::isOpen() const {
 void GameEngine::run() {
     std::cout << "Engine running... (Press ESC to exit)" << std::endl;
     
+    if (font_.openFromFile("game/assets/fonts/arial.ttf")) {
+        scoreText.setFont(font_);
+        scoreText.setFillColor(sf::Color::White);
+        scoreText.setPosition({10.f, 10.f});
+    }
+    
     player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
-    player_->getComponent<CTransform>().position = Vec2f(window_.getSize().x / 2, window_.getSize().y / 2);
+    Vec2f startPos = Vec2f(window_.getSize().x / 2, window_.getSize().y / 2);
+    player_->getComponent<CTransform>().position = startPos;
+    player_->startPosition = startPos;
+    ScoreSystem::getInstance().setScore(0);
     
     while (window_.isOpen() && bIsRunning_) {
         float deltaTime = clock_.restart().asSeconds();
@@ -59,6 +72,8 @@ void GameEngine::render(float deltaTime) {
     
     drawTestGrid();
     RenderSystem::getInstance().update(window_, deltaTime);
+    scoreText.setString(sf::String("Score: ") + std::to_string(ScoreSystem::getInstance().getScore()));    
+    window_.draw(scoreText);
     debugUI_.Render();
     window_.display();
 }
@@ -139,30 +154,46 @@ void GameEngine::handleEvent(const sf::Event::KeyReleased& event) {
 }
 
 void GameEngine::handleEvent(const sf::Event::MouseButtonPressed& event) {
+    if (debugUI_.GetAnyItemHovered()) return;
 
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window_);
+    Entity* player = EntityManager::getInstance().getEntities("player").front().get();
+    CTransform playerTransform = player->getComponent<CTransform>();
+    Vec2f shootDirection = Vec2f(mousePos.x, mousePos.y) - playerTransform.getPosition();
+    
+    auto e = EntityManager::getInstance().addEntity("bullet");
+    e->addComponent<CTransform>(playerTransform.getPosition(), shootDirection.normalized() * 700, 0);
+    e->addComponent<CShape>(12, 20, sf::Color::White, sf::Color::White, 0);
+    e->addComponent<CCircleCollider>(12);
+    e->addComponent<CLifespan>(6);
 }
 
-void GameEngine::handleEvent(const sf::Event::MouseMoved& event) {}
+void GameEngine::handleEvent(const sf::Event::MouseMoved& event)
+{
+    
+}
 
 void GameEngine::handleEvent(const sf::Event::Resized& event) {
 }
 
 void GameEngine::drawTestGrid() {
-    const float gridSpacing = 50.0f;
+    const float gridSpacing = 40.0f;
     auto windowSize = window_.getSize();
-    sf::Color gridColor(50, 50, 50);
-    
-    for (float x = 0; x <= windowSize.x; x += gridSpacing) {
-        sf::RectangleShape line({1.0f, static_cast<float>(windowSize.y)});
-        line.setPosition({x, 0.0f});
-        line.setFillColor(gridColor);
-        window_.draw(line);
-    }
-    
-    for (float y = 0; y <= windowSize.y; y += gridSpacing) {
-        sf::RectangleShape line({static_cast<float>(windowSize.x), 1.0f});
-        line.setPosition({0.0f, y});
-        line.setFillColor(gridColor);
-        window_.draw(line);
+
+    const sf::Color blue(28, 27, 30);
+    const sf::Color dark_blue(17, 16, 21);
+
+    for (float y = 0; y < windowSize.y; y += gridSpacing) {
+        for (float x = 0; x < windowSize.x; x += gridSpacing) {
+            sf::RectangleShape square({gridSpacing, gridSpacing});
+            square.setPosition({x, y});
+
+            // Checkerboard pattern
+            const int col = static_cast<int>(x / gridSpacing);
+            const int row = static_cast<int>(y / gridSpacing);
+
+            square.setFillColor((col + row) % 2 == 0 ? blue : dark_blue);
+            window_.draw(square);
+        }
     }
 }

@@ -27,9 +27,11 @@ void MovementSystem::update(EPlayer* player, float deltaTime)
         }
     }
     
-    auto& enemies = EntityManager::getInstance().getEntities("enemy");
-    for (auto& e : enemies)
+    std::vector<std::string> tags{"bullet", "enemy"};
+    auto movable_entities = EntityManager::getInstance().getEntities(tags);
+    for (auto& e : movable_entities)
     {
+        if (!e->hasComponent<CTransform>()) return;
         auto& transform = e->getComponent<CTransform>();
         transform.position.y += transform.velocity.y * deltaTime;
         transform.position.x += transform.velocity.x * deltaTime;

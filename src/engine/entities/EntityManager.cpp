@@ -60,3 +60,17 @@ EntityVec& EntityManager::getEntities(const std::string& tag)
 {
     return entitiesMap_[tag];
 }
+
+EntityVec EntityManager::getEntities(const std::vector<std::string>& tags)
+{
+    EntityVec entities;
+    for (const auto& tag : tags)
+    {
+        auto it = entitiesMap_.find(tag);
+        if (it != entitiesMap_.end())
+        {
+            entities.insert(entities.end(), it->second.begin(), it->second.end());
+        }
+    }
+    return entities;
+}

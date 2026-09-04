@@ -31,4 +31,5 @@ public:
     
     EntityVec& getEntities();
     EntityVec& getEntities(const std::string& tag);
+    EntityVec getEntities(const std::vector<std::string>& tags);
 };

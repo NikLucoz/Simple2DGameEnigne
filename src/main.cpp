@@ -4,7 +4,7 @@
 
 int main() {
     try {
-        GameEngine engine(1024, 768, "Game Engine");
+        GameEngine engine(1280, 720, "Game Engine");
         engine.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

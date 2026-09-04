@@ -24,11 +24,17 @@ void EnemySpawnSystem::update(float deltaTime, sf::RenderWindow& window)
         float speed = 300.0f;
         float velX = std::cos(randomAngle) * speed;
         float velY = std::sin(randomAngle) * speed;
+        
+        int randomPoints = 3 + rand() % (6 + 1);
+        
+        int r = rand() % 255;
+        int g = rand() % 255;
+        int b = rand() % 255;
 
         auto e = EntityManager::getInstance().addEntity("enemy");
         e->addComponent<CTransform>(Vec2f(randomX, randomY), Vec2f(velX, velY), 0);
-        e->addComponent<CShape>(40, 5, sf::Color::Blue, sf::Color::White, 10);
-        e->addComponent<CCircleCollider>(50);
+        e->addComponent<CShape>(25, randomPoints, sf::Color(r, g, b), sf::Color::White, 4);
+        e->addComponent<CCircleCollider>(25);
 
         elapsedTime = spawnMaxTime;
     }

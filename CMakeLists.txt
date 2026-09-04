@@ -138,7 +138,6 @@ target_sources(game_engine PRIVATE
     src/engine/components/CInput.cpp
     src/engine/utils/math/Vector2.cpp
     src/engine/utils/debug_ui/DebugUI.cpp
-    src/engine/utils/random.cpp
     src/engine/systems/RenderSystem.cpp
     src/engine/systems/MovementSystem.cpp
     src/engine/systems/CollisionSystem.cpp
