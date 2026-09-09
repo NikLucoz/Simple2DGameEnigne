@@ -168,10 +168,12 @@ PYTHONPATH=C:\Users\lucoz\AppData\Local\.xmake\packages\p\python\3.14.3\a5aba9c0
     <ClInclude Include="..\..\src\engine\actions\Action.h" />
     <ClInclude Include="..\..\src\engine\assets\Animation.h" />
     <ClInclude Include="..\..\src\engine\assets\Assets.h" />
+    <ClInclude Include="..\..\src\engine\components\CBoundingBox.h" />
     <ClInclude Include="..\..\src\engine\components\CSpecialBullet.h" />
     <ClInclude Include="..\..\src\engine\GameEngine.h" />
     <ClInclude Include="..\..\src\engine\scenes\Scene.h" />
     <ClInclude Include="..\..\src\engine\scenes\ScenePlay.h" />
+    <ClInclude Include="..\..\src\engine\utils\physics\CollisionUtils.h" />
 
 
   </ItemGroup>
@@ -301,6 +303,7 @@ PYTHONPATH=C:\Users\lucoz\AppData\Local\.xmake\packages\p\python\3.14.3\a5aba9c0
     </ClCompile>
     <ClCompile Include="..\..\src\engine\scenes\Scene.cpp" />
     <ClCompile Include="..\..\src\engine\scenes\ScenePlay.cpp" />
+    <ClCompile Include="..\..\src\engine\utils\physics\CollisionUtils.cpp" />
 
 
 

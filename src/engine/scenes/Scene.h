@@ -20,6 +20,7 @@ public:
     virtual ~Scene() = default;
     virtual void update(float dt) = 0;
     virtual void sRender(float dt) = 0;
+    virtual void sDebug() = 0;
     virtual void sDoAction(const Action& action) = 0;
     void simulate(int);
     

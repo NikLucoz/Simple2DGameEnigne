@@ -10,6 +10,6 @@ public:
         addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(300.0f, 300.0f), 0);
         addComponent<CShape>(30, 12, sf::Color::Black, sf::Color::Red, 5);
         addComponent<CInput>();
-        addComponent<CCircleCollider>(30);
+        addComponent<CBoundingBox>(Vector2<int>(60,60));
     }
 };

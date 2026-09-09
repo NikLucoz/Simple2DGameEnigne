@@ -6,6 +6,17 @@
 #include "engine/actions/Action.h"
 #include "engine/entities/EntityManager.h"
 #include "engine/entities/EPlayer.h"
+#include "engine/utils/physics/CollisionUtils.h"
+
+ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameEngine), enemySpawnMaxTime(enemySpawnTime)
+{
+    elapsedTimeSinceLastEnemySpawn_ = enemySpawnTime;
+        
+    player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
+    Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
+    player_->getComponent<CTransform>().position = startPos;
+    player_->startPosition = startPos;
+}
 
 void ScenePlay::update(float dt)
 {
@@ -68,6 +79,7 @@ void ScenePlay::sRender(float dt)
         }
          */
     }
+    sDebug();
 }
 
 void ScenePlay::sDoAction(const Action& action)
@@ -159,7 +171,7 @@ void ScenePlay::sEnemySpawner(float dt)
         auto e = EntityManager::getInstance().addEntity("enemy");
         e->addComponent<CTransform>(Vec2f(randomX, randomY), Vec2f(velX, velY), 0);
         e->addComponent<CShape>(25, randomPoints, sf::Color(r, g, b), sf::Color::White, 4);
-        e->addComponent<CCircleCollider>(25);
+        e->addComponent<CBoundingBox>(Vector2<int>(50,50));
 
         elapsedTimeSinceLastEnemySpawn_ = enemySpawnMaxTime;
     }
@@ -167,7 +179,6 @@ void ScenePlay::sEnemySpawner(float dt)
 
 void ScenePlay::sCollision()
 {
-    //if (!bIsActive_) return;
     auto& enemies = EntityManager::getInstance().getEntities("enemy");
     
     std::vector<std::string> tags{"bullet", "specialBullet"};
@@ -176,10 +187,36 @@ void ScenePlay::sCollision()
     if (player_ == nullptr) return;
     
     auto& pTransform = player_->getComponent<CTransform>();
-    auto& pCollider = player_->getComponent<CCircleCollider>();
+    auto& pCollider = player_->getComponent<CBoundingBox>();
     
     for (auto& enemy : enemies)
     {
+        
+        auto& eTransform = enemy->getComponent<CTransform>();
+        auto& eBoundingBox = enemy->getComponent<CBoundingBox>();
+        if (!enemy->hasComponent<CBoundingBox>()) continue;
+        if (IsColliding(player_.get(), enemy.get()))
+        {
+            spawnEnemyDeathParticles(enemy.get());
+            enemy->destroy();
+            pTransform.position = player_->startPosition;
+            break;
+        }
+        
+        if (eTransform.getPosition().x - eBoundingBox.size.x < 0 ||
+            eTransform.getPosition().x + eBoundingBox.size.x > gameEngine_->getWindow().getSize().x)
+        {
+            eTransform.velocity = eTransform.velocity.reflectionVector({1.0f, 0.0f});
+        }
+        
+        // Horizontal wall collision
+        if (eTransform.getPosition().y - eBoundingBox.size.y < 0 ||
+            eTransform.getPosition().y + eBoundingBox.size.y > gameEngine_->getWindow().getSize().y)
+        {
+            eTransform.velocity = eTransform.velocity.reflectionVector({0.0f, 1.0f});
+        }
+        
+        /*
         if (!enemy->hasComponent<CCircleCollider>()) continue;
         auto& eTransform = enemy->getComponent<CTransform>();
         auto& eCollider = enemy->getComponent<CCircleCollider>();
@@ -189,7 +226,7 @@ void ScenePlay::sCollision()
         {
             spawnEnemyDeathParticles(enemy.get());
             enemy->destroy();
-            // TODO:ScoreSystem::getInstance().addScore(-200);
+            // TODO: ScoreSystem::getInstance().addScore(-200);
             pTransform.position = player_->startPosition;
             break;
         }
@@ -224,6 +261,9 @@ void ScenePlay::sCollision()
         {
             eTransform.velocity = eTransform.velocity.reflectionVector({0.0f, 1.0f});
         }
+        */
+        
+       
     }
 }
 
@@ -275,6 +315,18 @@ void ScenePlay::sDebug()
                 sfShape.setFillColor(sf::Color::Transparent);
                 sfShape.setOutlineColor(sf::Color::Green);
                 sfShape.setOutlineThickness(2);
+                gameEngine_->getWindow().draw(sfShape);
+            }
+            
+            if (e.hasComponent<CBoundingBox>())
+            {
+                CBoundingBox& b = e.getComponent<CBoundingBox>();
+                sf::RectangleShape sfShape;
+                sfShape.setOutlineColor(sf::Color::Green);
+                sfShape.setOutlineThickness(2);
+                sfShape.setFillColor(sf::Color::Transparent);
+                sfShape.setPosition(sf::Vector2f(pos.x - b.size.x/2, pos.y - b.size.y/2));
+                sfShape.setSize(sf::Vector2f(b.size.x, b.size.y));
                 gameEngine_->getWindow().draw(sfShape);
             }
         }

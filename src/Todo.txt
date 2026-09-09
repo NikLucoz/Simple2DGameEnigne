@@ -1,33 +1,6 @@
-﻿Create new AABB collision system
+﻿Handle asset loading + scene loading
 Create Animation class and setup assets loading
-Handle asset loading + scene loading
 Setup input actions system
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #include "Engine.h"
 

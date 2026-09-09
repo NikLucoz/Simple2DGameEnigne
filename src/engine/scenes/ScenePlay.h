@@ -10,15 +10,7 @@ class ScenePlay : public Scene
     float enemySpawnMaxTime;
     std::shared_ptr<EPlayer> player_;
 public:
-    ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameEngine), enemySpawnMaxTime(enemySpawnTime)
-    {
-        elapsedTimeSinceLastEnemySpawn_ = enemySpawnTime;
-        
-        player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
-        Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
-        player_->getComponent<CTransform>().position = startPos;
-        player_->startPosition = startPos;
-    }
+    ScenePlay(GameEngine* gameEngine, float enemySpawnTime);
 
     void update(float dt) override;
     void sRender(float dt) override;

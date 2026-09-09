@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 
+#include "engine/components/CBoundingBox.h"
 #include "engine/components/CCircleCollider.h"
 #include "engine/components/CInput.h"
 #include "engine/components/CLifespan.h"
@@ -18,7 +19,8 @@ using ComponentTuple = std::tuple<
     CInput,
     CCircleCollider,
     CLifespan,
-    CSpecialBullet
+    CSpecialBullet,
+    CBoundingBox
 >;
 
 class Entity
