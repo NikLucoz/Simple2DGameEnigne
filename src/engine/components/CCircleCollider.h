@@ -10,5 +10,4 @@ public:
     {
         this->radius_ = radius;
     }
-
 };

@@ -13,7 +13,7 @@ private:
 public:
 	DebugUI();
 	void Init(sf::RenderWindow& window);
-	void Update(sf::Clock& deltaClock, const EntityVec& entities);
+	void Update(sf::Clock& deltaClock);
 	void Render();
 	void ProcessEvent(sf::Event& event);
 	bool GetAnyItemHovered();

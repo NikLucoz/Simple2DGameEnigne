@@ -4,11 +4,6 @@
 #include <imgui-SFML.h>
 #include <iostream>
 
-#include "engine/systems/EnemySpawnSystem.h"
-#include "engine/systems/LifeSpanSystem.h"
-#include "engine/systems/CollisionSystem.h"
-#include "engine/systems/MovementSystem.h"
-#include "engine/systems/RenderSystem.h"
 #include "engine/entities/EntityManager.h"
 #include "engine/components/CTransform.h"
 
@@ -27,7 +22,7 @@ void DebugUI::Init(sf::RenderWindow& window)
     ImGui::GetStyle().ScaleAllSizes(1.0f);
 }
 
-void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
+void DebugUI::Update(sf::Clock& deltaClock)
 {
     ImGui::SFML::Update(*Window, deltaClock.restart());
 
@@ -39,7 +34,8 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
         // --------------------------------------------------
         // TAB 1: SYSTEM
         // --------------------------------------------------
-        if (ImGui::BeginTabItem("System"))
+        /*
+        * if (ImGui::BeginTabItem("System"))
         {
             bool isMovementActive = MovementSystem::getInstance().bIsActive_;
             if (ImGui::Checkbox("Movement System", &isMovementActive)) {
@@ -78,6 +74,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
 
             ImGui::EndTabItem();
         }
+         */
 
         // --------------------------------------------------
         // TAB 2: ENTITIES
@@ -85,6 +82,7 @@ void DebugUI::Update(sf::Clock& deltaClock, const EntityVec& entities)
         if (ImGui::BeginTabItem("Entities"))
         {
             // Raggruppa le entità per tag
+            auto& entities = EntityManager::getInstance().getEntities();
             std::map<std::string, EntityVec> entitiesByTag;
             for (auto& e : entities) {
                 entitiesByTag[e->getTag()].push_back(e);

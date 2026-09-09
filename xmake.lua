@@ -8,7 +8,17 @@ add_rules("plugin.compile_commands.autoupdate", {outputdir = "."})
 set_languages("cxx17")
 
 -- Dependencies managed automatically by Xmake
-add_requires("sfml >=3.0.0", {system = false})
+add_requires("sfml >=3.0.0", {
+    system = false,
+    configs = {
+        graphics = true,
+        window   = true,
+        audio    = true,
+        network  = false,   -- set to true if you need it
+        shared   = false    -- static is usually easier on Windows
+    }
+})
+
 add_requires("imgui-sfml", {system = false})
 
 target("game_engine")
