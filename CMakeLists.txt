@@ -23,8 +23,7 @@ if(NOT CURRENT_LINKER_FRONTEND_VARIANT)
 endif()
 
 # target
-add_executable(game_engine ""
-        src/engine/systems/MovementSystem.cpp)
+add_executable(game_engine )
 set_target_properties(game_engine PROPERTIES OUTPUT_NAME "game_engine")
 set_target_properties(game_engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bin")
 target_include_directories(game_engine PRIVATE
@@ -138,10 +137,6 @@ target_sources(game_engine PRIVATE
     src/engine/components/CInput.cpp
     src/engine/utils/math/Vector2.cpp
     src/engine/utils/debug_ui/DebugUI.cpp
-    src/engine/systems/RenderSystem.cpp
-    src/engine/systems/MovementSystem.cpp
-    src/engine/systems/CollisionSystem.cpp
-    src/engine/systems/LifeSpanSystem.cpp
-    src/engine/Engine.cpp
+    src/engine/GameEngine.cpp
 )
 

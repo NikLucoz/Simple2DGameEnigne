@@ -220,7 +220,6 @@ PYTHONPATH=C:\Users\lucoz\AppData\Local\.xmake\packages\p\python\3.14.3\a5aba9c0
     <ClCompile Include="$(XmakeProjectDir)\src\main.cpp">
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\src\engine\actions\Action.cpp" />
     <ClCompile Include="..\..\src\engine\assets\Animation.cpp" />
     <ClCompile Include="..\..\src\engine\assets\Assets.cpp" />
     <ClCompile Include="..\..\src\engine\components\CSpecialBullet.cpp" />

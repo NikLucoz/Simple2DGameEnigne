@@ -6,6 +6,8 @@
 #include "engine/scenes/Scene.h"
 #include "entities/EntityManager.h"
 #include "scenes/ScenePlay.h"
+#include "engine/actions/Action.h"
+#include "engine/scenes/MainMenuScene.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
     : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(new Assets()), scenes_()
@@ -19,8 +21,8 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 void GameEngine::init()
 {
     assets_->addFont("arial", "game/assets/fonts/arial.ttf");
-    auto scene = std::make_shared<ScenePlay>(this, 1.0f);
-    scenes_["gameplay_scene"] = scene;
+    scenes_["main_menu_scene"] = std::make_shared<MainMenuScene>(this);
+    scenes_["gameplay_scene"] = std::make_shared<ScenePlay>(this, 1.0f);
     currentScene_ = scenes_.begin()->first;
 }
 
@@ -78,15 +80,60 @@ void GameEngine::quit() const
 
 void GameEngine::handleEvents()
 {
-    while (const std::optional event = window_.pollEvent())
-    {
-        if (event->is<sf::Event::Closed>())
-        {
+    while (auto event = window_.pollEvent()) {
+        debugUI_.ProcessEvent(*event);
+        
+        if (event->is<sf::Event::Closed>()) {
             window_.close();
             bIsRunning_ = false;
         }
-        // TODO: add extra events
+        
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            handleUserKeyboardInputEvent(keyPressed->code, "pressed");
+        }
+        
+        if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+            handleUserKeyboardInputEvent(keyReleased->code, "released");
+        }
+        
+        if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+            handleUserMouseInputEvent(mouseButtonPressed->button, "pressed");
+        }
+        
+        if (const auto* mouseButtonReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
+            handleUserMouseInputEvent(mouseButtonReleased->button, "released");
+        }
     }
+}
+
+void GameEngine::handleUserKeyboardInputEvent(sf::Keyboard::Key keyCode, const std::string& actionType) {
+    const InputBinding binding {
+        InputDevice::Keyboard,
+        static_cast<int>(keyCode)
+    };
+
+    auto& actionMap = getCurrentScene()->getActionMap();
+    auto action = actionMap.find(binding);
+
+    if (action == actionMap.end())
+        return;
+
+    getCurrentScene()->doAction(Action(action->second, actionType));
+}
+
+void GameEngine::handleUserMouseInputEvent(sf::Mouse::Button button, const std::string& actionType) {
+    const InputBinding binding {
+        InputDevice::MouseButton,
+        static_cast<int>(button)
+    };
+
+    auto& actionMap = getCurrentScene()->getActionMap();
+    auto action = actionMap.find(binding);
+
+    if (action == actionMap.end())
+        return;
+
+    getCurrentScene()->doAction(Action(action->second, actionType));
 }
 
 void GameEngine::changeScene(const std::string& sceneName, const std::shared_ptr<Scene>& scene)

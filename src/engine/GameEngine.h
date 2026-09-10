@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include "engine/Assets/Assets.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include "scenes/Scene.h"
@@ -23,6 +24,9 @@ class GameEngine
     {
         return scenes_[currentScene_].get();
     }
+
+    void handleUserKeyboardInputEvent(sf::Keyboard::Key keyCode, const std::string& actionType);
+    void handleUserMouseInputEvent(sf::Mouse::Button button, const std::string& actionType);
 
 public:
     GameEngine() = default;

@@ -16,6 +16,13 @@ ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameE
     Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
     player_->getComponent<CTransform>().position = startPos;
     player_->startPosition = startPos;
+
+    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::W), "Move_Up");
+    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::S), "Move_Down");
+    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::A), "Move_Left");
+    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::D), "Move_Right");
+    registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Left), "Shoot");
+    registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Right), "SpecialShoot");
 }
 
 void ScenePlay::update(float dt)
@@ -84,6 +91,35 @@ void ScenePlay::sRender(float dt)
 
 void ScenePlay::sDoAction(const Action& action)
 {
+    if (action.name() == "Move_Up")
+    {
+        player_->getComponent<CInput>().bUp = action.type() == "pressed" ? true : false;
+    }
+    
+    if (action.name() == "Move_Down")
+    {
+        player_->getComponent<CInput>().bDown = action.type() == "pressed" ? true : false;
+    }
+    
+    if (action.name() == "Move_Left")
+    {
+        player_->getComponent<CInput>().bLeft = action.type() == "pressed" ? true : false;
+    }
+    
+    if (action.name() == "Move_Right")
+    {
+        player_->getComponent<CInput>().bRight = action.type() == "pressed" ? true : false;
+    }
+
+    if (action.name() == "Shoot")
+    {
+        player_->getComponent<CInput>().bMouseLeft = action.type() == "pressed" ? true : false;
+    }
+    
+    if (action.name() == "SpecialShoot")
+    {
+        player_->getComponent<CInput>().bMouseRight = action.type() == "pressed" ? true : false;
+    }
 }
 
 void ScenePlay::sAnimation()
