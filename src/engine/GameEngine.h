@@ -37,6 +37,7 @@ public:
     void handleEvents();
     void update(float deltaTime);
     void render(float deltaTime);
+    void changeScene(const std::string& sceneName);
     void changeScene(const std::string& sceneName, const std::shared_ptr<Scene>& scene);
     void sUserInput();
     

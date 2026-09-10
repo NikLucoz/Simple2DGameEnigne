@@ -23,7 +23,7 @@ void GameEngine::init()
     assets_->addFont("arial", "game/assets/fonts/arial.ttf");
     scenes_["main_menu_scene"] = std::make_shared<MainMenuScene>(this);
     scenes_["gameplay_scene"] = std::make_shared<ScenePlay>(this, 1.0f);
-    currentScene_ = scenes_.begin()->first;
+    currentScene_ = "main_menu_scene";
 }
 
 void GameEngine::run()
@@ -136,13 +136,32 @@ void GameEngine::handleUserMouseInputEvent(sf::Mouse::Button button, const std::
     getCurrentScene()->doAction(Action(action->second, actionType));
 }
 
+void GameEngine::changeScene(const std::string& sceneName)
+{
+    if (scenes_.find(sceneName) == scenes_.end()) {
+        throw std::invalid_argument("Scene '" + sceneName + "' is not registered");
+    }
+
+    if (getCurrentScene() != nullptr && currentScene_ == sceneName) {
+        std::cout << "Scene '" << sceneName << "' is already the current scene." << std::endl;
+        return;
+    }
+
+    currentScene_ = sceneName;
+}
+
 void GameEngine::changeScene(const std::string& sceneName, const std::shared_ptr<Scene>& scene)
 {
+    if (scene == nullptr) {
+        throw std::invalid_argument("Scene pointer is null");
+    }
+
     if (scenes_.find(sceneName) == scenes_.end())
     {
         scenes_[sceneName] = scene;
     }
-    currentScene_ = sceneName;
+
+    changeScene(sceneName);
 }
 
 Assets& GameEngine::getAssets() const

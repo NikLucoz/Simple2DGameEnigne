@@ -2,6 +2,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include "engine/actions/Action.h"
+#include "ScenePlay.h"
 
 MainMenuScene::MainMenuScene(GameEngine* gameEngine) : Scene(gameEngine) {
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Enter), "UI_Enter");
@@ -24,5 +25,7 @@ void MainMenuScene::sDebug()
 
 void MainMenuScene::sDoAction(const Action &action)
 {
-    std::cout << "MainMenuScene received action: " << action.toString() << std::endl;
+    if (action.name() == "UI_Enter") {
+        gameEngine_->changeScene("gameplay_scene");
+    }
 }
