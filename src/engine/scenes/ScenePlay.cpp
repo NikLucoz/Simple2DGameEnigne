@@ -7,11 +7,13 @@
 #include "engine/entities/EntityManager.h"
 #include "engine/entities/EPlayer.h"
 #include "engine/utils/physics/CollisionUtils.h"
+#include <engine/utils/assets/TileMapLoader.h>
 
 ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameEngine), enemySpawnMaxTime(enemySpawnTime)
 {
     elapsedTimeSinceLastEnemySpawn_ = enemySpawnTime;
-        
+    tilemap_ = TileMapLoader::load("game/levels/example_level.cfg");
+
     player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
     Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
     player_->getComponent<CTransform>().position = startPos;
@@ -35,13 +37,15 @@ void ScenePlay::update(float dt)
     sMovement(dt);
     sCollision();
     sLifespan(dt);
-    sEnemySpawner(dt);
+    //sEnemySpawner(dt);
     sAnimation(dt);
     if (bShouldShowDebug_) sDebug();
 }
 
 void ScenePlay::sRender(float dt)
-{
+{   
+    tilemap_.drawLayer(gameEngine_->getWindow(), gameEngine_->getAssets(), tilemap_.getLayer("ground"));
+
     for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
     {
         Entity& e = *ePtr;

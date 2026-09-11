@@ -180,7 +180,7 @@ void GameEngine::sUserInput()
 }
 
 void GameEngine::drawTestGrid(sf::RenderWindow& window) {
-    const float gridSpacing = 40.0f;
+    const float gridSpacing = 64.0f;
     auto windowSize = window.getSize();
 
     const sf::Color blue(28, 27, 30);

@@ -3,12 +3,14 @@
 #include "engine/GameEngine.h"
 #include "engine/entities/EntityManager.h"
 #include "engine/entities/EPlayer.h"
+#include "engine/assets/tilemap/Tilemap.h"
 
 class ScenePlay : public Scene
 {
     float elapsedTimeSinceLastEnemySpawn_ = 0.0f;
     float enemySpawnMaxTime;
     std::shared_ptr<EPlayer> player_;
+    TileMap tilemap_;
 public:
     ScenePlay(GameEngine* gameEngine, float enemySpawnTime);
 
