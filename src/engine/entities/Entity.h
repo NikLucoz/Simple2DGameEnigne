@@ -11,6 +11,7 @@
 #include "engine/components/CSpecialBullet.h"
 #include "engine/components/CSprite.h"
 #include "engine/components/CTransform.h"
+#include "engine/components/CAnimatedSprite.h"
 
 using ComponentTuple = std::tuple<
     CTransform,
@@ -20,7 +21,8 @@ using ComponentTuple = std::tuple<
     CCircleCollider,
     CLifespan,
     CSpecialBullet,
-    CBoundingBox
+    CBoundingBox,
+    CAnimatedSprite
 >;
 
 class Entity

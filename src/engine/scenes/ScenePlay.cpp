@@ -23,6 +23,11 @@ ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameE
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::D), "Move_Right");
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Left), "Shoot");
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Right), "SpecialShoot");
+
+    auto& gumba = EntityManager::getInstance().addEntity("enemy");
+    gumba->addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(0.0f, 0.0f), 0.0f);
+    gumba->addComponent<CAnimatedSprite>(gameEngine_->getAssets().getAnimation("gumbaWalkingAnimation"));
+    gumba->addComponent<CBoundingBox>(Vector2<int>(16, 16));
 }
 
 void ScenePlay::update(float dt)
@@ -55,6 +60,15 @@ void ScenePlay::sRender(float dt)
             cShape.getShape()->setOutlineColor(cShape.outlineColor_);
             cShape.getShape()->setOutlineThickness(cShape.outlineThickness_);
             gameEngine_->getWindow().draw(*cShape.getShape());
+        }
+
+        if (e.hasComponent<CAnimatedSprite>()) {
+            CAnimatedSprite& cAnimatedSprite = e.getComponent<CAnimatedSprite>();
+            auto& sprite = cAnimatedSprite.animation->getSprite();
+
+            sprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
+            sprite.setRotation(sf::degrees(transform.getRotation()));
+            gameEngine_->getWindow().draw(sprite);
         }
         
         /*
@@ -124,6 +138,11 @@ void ScenePlay::sDoAction(const Action& action)
 
 void ScenePlay::sAnimation()
 {
+    for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
+    if (ePtr->hasComponent<CAnimatedSprite>()) {
+        auto& cAnimatedSprite = ePtr->getComponent<CAnimatedSprite>();
+        cAnimatedSprite.animation->update(); 
+    }
 }
 
 void ScenePlay::sMovement(float dt)

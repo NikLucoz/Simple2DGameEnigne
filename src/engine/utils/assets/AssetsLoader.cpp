@@ -16,8 +16,17 @@ void AssetsLoader::loadAssetsFromFile(Assets &assets, const std::string &filePat
 
     std::string line = "";
     while (std::getline(file, line)) {
+        if (line._Starts_with("//") || line.empty()) continue;
+
         auto tokens = splitBySpace(line);
-        if (tokens.empty()) {
+        if (tokens.empty() || tokens[0][0] == '#') {
+            continue;
+        }
+
+        const size_t requiredTokens = tokens[0] == "Animation" ? 5 : 3;
+        if (tokens.size() < requiredTokens)
+        {
+            std::cerr << "Invalid asset definition: " << line << std::endl;
             continue;
         }
 
@@ -30,8 +39,13 @@ void AssetsLoader::loadAssetsFromFile(Assets &assets, const std::string &filePat
         } else if (assetType == "Sound") {
             assets.addSound(assetName, assetPath);
         } else if (assetType == "Animation") {
-            // TODO: Need to read additional tokens for animation frame count and animation speed
-            // TODO: assets.addAnimation(assetName, animation);
+            const std::string& animationFrames = tokens[3];
+            const std::string& animationSpeed = tokens[4];
+            const std::string& animationIsLoopable = tokens[5];
+
+            bool bIsLoopable = animationIsLoopable == "true" ? true : false;
+            Animation animation(assetName, assets.getTexture(assetPath), std::stoi(animationFrames), std::stoi(animationSpeed), bIsLoopable);
+            assets.addAnimation(assetName, animation);
         } else if (assetType == "Font") {
             assets.addFont(assetName, assetPath);
         } else {
