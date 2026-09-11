@@ -29,7 +29,7 @@ void Assets::addAnimation(std::string name, Animation animation)
 void Assets::addFont(std::string name, std::string path)
 {
     sf::Font font;
-    if (font.openFromFile("game/assets/fonts/arial.ttf")) {
+    if (font.openFromFile(path)) {
         fonts_[name] = font;
     }
 }

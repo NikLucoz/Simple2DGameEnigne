@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include <SFML/System/String.hpp>
+#include <string>
 
 class Action
 {
-    sf::String name_ = "NONE";
-    sf::String type_ = "NONE";
+    std::string name_ = "NONE";
+    std::string type_ = "NONE";
 public:
     Action();
     Action(const std::string& name, const std::string& type);

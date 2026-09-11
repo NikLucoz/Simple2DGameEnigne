@@ -8,6 +8,7 @@
 #include "scenes/ScenePlay.h"
 #include "engine/actions/Action.h"
 #include "engine/scenes/MainMenuScene.h"
+#include "engine/utils/assets/AssetsLoader.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
     : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(new Assets()), scenes_()
@@ -20,7 +21,7 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
 
 void GameEngine::init()
 {
-    assets_->addFont("arial", "game/assets/fonts/arial.ttf");
+    AssetsLoader::loadAssetsFromFile(*assets_, "game/assets/assets.cfg");
     scenes_["main_menu_scene"] = std::make_shared<MainMenuScene>(this);
     scenes_["gameplay_scene"] = std::make_shared<ScenePlay>(this, 1.0f);
     currentScene_ = "main_menu_scene";
@@ -55,7 +56,7 @@ void GameEngine::update(float deltaTime)
     EntityManager::getInstance().update();
     handleEvents();
     currentScene->update(deltaTime);
-    //debugUI_.Update(clock_);
+    debugUI_.Update(clock_);
     render(deltaTime);
 }
 
@@ -72,10 +73,10 @@ void GameEngine::render(float deltaTime) {
     window_.display();
 }
 
-void GameEngine::quit() const
+void GameEngine::quit()
 {
-    //window_.close();
-    //bIsRunning_ = false;
+    window_.close();
+    bIsRunning_ = false;
 }
 
 void GameEngine::handleEvents()
@@ -84,8 +85,7 @@ void GameEngine::handleEvents()
         debugUI_.ProcessEvent(*event);
         
         if (event->is<sf::Event::Closed>()) {
-            window_.close();
-            bIsRunning_ = false;
+            quit();
         }
         
         if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {

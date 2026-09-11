@@ -33,7 +33,7 @@ public:
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
     
     void run();
-    void quit() const;
+    void quit();
     void handleEvents();
     void update(float deltaTime);
     void render(float deltaTime);
