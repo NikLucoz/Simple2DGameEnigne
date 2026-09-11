@@ -72,13 +72,12 @@ void ScenePlay::sRender(float dt)
             gameEngine_->getWindow().draw(sprite);
         }
         
+        
         /*
-        * if (e.hasComponent<CSprite>())
+        if (e.hasComponent<CSprite>())
         {
             CSprite& sprite = e.getComponent<CSprite>();
-            if (sprite.m_filepath.empty()) return;
-    
-            sf::Sprite sfSprite(sprite.getTexture());
+            auto& sfSprite = sprite.getTexture();
             sf::Vector2u textureSize = sprite.getTexture().getSize();
             Vec2f desiredSize = sprite.getSize();
             
@@ -99,7 +98,7 @@ void ScenePlay::sRender(float dt)
             sfSprite.setRotation(sf::degrees(transform.getRotation()));
             gameEngine_->getWindow().draw(sfSprite);
         }
-         */
+        */
     }
     sDebug();
 }
@@ -256,6 +255,22 @@ void ScenePlay::sCollision()
             pTransform.position = player_->startPosition;
             break;
         }
+
+        for (auto& bullet : bullets)
+        {
+            if (!bullet->hasComponent<CCircleCollider>()) continue;
+            auto& bTransform = bullet->getComponent<CTransform>();
+            auto& bCollider = bullet->getComponent<CBoundingBox>();
+            
+            float distanceToBullet = eTransform.getPosition().distanceToSquared(bTransform.getPosition());
+             if (IsColliding(enemy.get(), bullet.get()))
+            {
+                spawnEnemyDeathParticles(enemy.get());
+                enemy->destroy();
+                bullet->destroy();
+                break;
+            }
+        }
         
         if (eTransform.getPosition().x - eBoundingBox.size.x < 0 ||
             eTransform.getPosition().x + eBoundingBox.size.x > gameEngine_->getWindow().getSize().x)
@@ -269,55 +284,6 @@ void ScenePlay::sCollision()
         {
             eTransform.velocity = eTransform.velocity.reflectionVector({0.0f, 1.0f});
         }
-        
-        /*
-        if (!enemy->hasComponent<CCircleCollider>()) continue;
-        auto& eTransform = enemy->getComponent<CTransform>();
-        auto& eCollider = enemy->getComponent<CCircleCollider>();
-
-        float distanceToPlayer = eTransform.getPosition().distanceToSquared(pTransform.getPosition());
-        if (distanceToPlayer < (eCollider.radius_ + pCollider.radius_) * (eCollider.radius_ + pCollider.radius_))
-        {
-            spawnEnemyDeathParticles(enemy.get());
-            enemy->destroy();
-            // TODO: ScoreSystem::getInstance().addScore(-200);
-            pTransform.position = player_->startPosition;
-            break;
-        }
-        
-        for (auto& bullet : bullets)
-        {
-            if (!bullet->hasComponent<CCircleCollider>()) continue;
-            auto& bTransform = bullet->getComponent<CTransform>();
-            auto& bCollider = bullet->getComponent<CCircleCollider>();
-            
-            float distanceToBullet = eTransform.getPosition().distanceToSquared(bTransform.getPosition());
-            if (distanceToBullet < (eCollider.radius_ + bCollider.radius_) * eCollider.radius_)
-            {
-                spawnEnemyDeathParticles(enemy.get());
-                enemy->destroy();
-                bullet->destroy();
-                // TODO: ScoreSystem::getInstance().addScore(50);
-                break;
-            }
-        }
-        
-        // Vertical wall collision
-        if (eTransform.getPosition().x - eCollider.radius_ < 0 ||
-            eTransform.getPosition().x + eCollider.radius_ > gameEngine_->getWindow().getSize().x)
-        {
-            eTransform.velocity = eTransform.velocity.reflectionVector({1.0f, 0.0f});
-        }
-        
-        // Horizontal wall collision
-        if (eTransform.getPosition().y - eCollider.radius_ < 0 ||
-            eTransform.getPosition().y + eCollider.radius_ > gameEngine_->getWindow().getSize().y)
-        {
-            eTransform.velocity = eTransform.velocity.reflectionVector({0.0f, 1.0f});
-        }
-        */
-        
-       
     }
 }
 

@@ -23,7 +23,7 @@ void AssetsLoader::loadAssetsFromFile(Assets &assets, const std::string &filePat
             continue;
         }
 
-        const size_t requiredTokens = tokens[0] == "Animation" ? 5 : 3;
+        const size_t requiredTokens = tokens[0] == "Animation" ? 6 : 3;
         if (tokens.size() < requiredTokens)
         {
             std::cerr << "Invalid asset definition: " << line << std::endl;
@@ -42,9 +42,11 @@ void AssetsLoader::loadAssetsFromFile(Assets &assets, const std::string &filePat
             const std::string& animationFrames = tokens[3];
             const std::string& animationSpeed = tokens[4];
             const std::string& animationIsLoopable = tokens[5];
+            const size_t frameWidth = tokens.size() > 6 ? std::stoul(tokens[6]) : 0;
+            const size_t frameHeight = tokens.size() > 7 ? std::stoul(tokens[7]) : 0;
 
             bool bIsLoopable = animationIsLoopable == "true" ? true : false;
-            Animation animation(assetName, assets.getTexture(assetPath), std::stoi(animationFrames), std::stoi(animationSpeed), bIsLoopable);
+            Animation animation(assetName, assets.getTexture(assetPath), std::stoul(animationFrames), std::stoi(animationSpeed), bIsLoopable, frameWidth, frameHeight);
             assets.addAnimation(assetName, animation);
         } else if (assetType == "Font") {
             assets.addFont(assetName, assetPath);

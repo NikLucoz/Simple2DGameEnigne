@@ -1,10 +1,4 @@
-﻿Create Animation class and setup assets loading
-Create Tile entity, level cfg file and rendering
-
-
-
-
-
+﻿Create Tile entity, level cfg file and rendering
 
 
 

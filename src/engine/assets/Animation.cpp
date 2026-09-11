@@ -2,12 +2,23 @@
 #include <algorithm>
 #include <SFML/Graphics/Texture.hpp>
 
-Animation::Animation(const std::string& name, const sf::Texture& texture, size_t frameCount, int speed, bool isLoopable)
-    : name(name), sprite_(texture), currentFrame(0), frameCount(frameCount), speed(speed), animationTick(0.0f), bIsLoopable(isLoopable)
+Animation::Animation(const std::string& name, const sf::Texture& texture, size_t frameCount, int speed, bool isLoopable, size_t frameWidth, size_t frameHeight) : name(name), sprite_(texture), currentFrame(0), frameCount(frameCount), columnCount(0), speed(speed), animationTick(0.0f), bIsLoopable(isLoopable)
 {
     if (frameCount > 0)
     {
-        size = Vector2<int>(texture.getSize().x / frameCount, texture.getSize().y);
+        const size_t textureWidth = texture.getSize().x;
+        const size_t textureHeight = texture.getSize().y;
+        const size_t resolvedFrameWidth = frameWidth > 0 ? frameWidth : textureHeight;
+        const size_t resolvedFrameHeight = frameHeight > 0 ? frameHeight : textureHeight;
+        columnCount = resolvedFrameWidth > 0 ? textureWidth / resolvedFrameWidth : 0;
+
+        if (columnCount == 0 || resolvedFrameHeight == 0) return;
+
+        const size_t rowCount = (frameCount + columnCount - 1) / columnCount;
+        const size_t availableRows = textureHeight / resolvedFrameHeight;
+        if (rowCount > availableRows) return;
+
+        size = Vector2<int>(static_cast<int>(resolvedFrameWidth), static_cast<int>(resolvedFrameHeight));
         setFrame(0);
     }
 }
@@ -29,7 +40,7 @@ void Animation::update(float deltaTime)
 
 void Animation::setFrame(size_t frame)
 {
-    if (frameCount == 0) return;
+    if (frameCount == 0 || columnCount == 0) return;
 
     if (bIsLoopable)
     {
@@ -41,11 +52,10 @@ void Animation::setFrame(size_t frame)
     }
 
     currentFrame = static_cast<int>(frame);
-    sprite_.setTextureRect(sf::IntRect({currentFrame * size.x, 0}, {size.x, size.y}));
-    sprite_.setOrigin({
-        size.x / 2.0f,
-        size.y / 2.0f
-    });
+    const int column = currentFrame % static_cast<int>(columnCount);
+    const int row = currentFrame / static_cast<int>(columnCount);
+    sprite_.setTextureRect(sf::IntRect({column * size.x, row * size.y}, {size.x, size.y}));
+    sprite_.setOrigin({ size.x / 2.0f, size.y / 2.0f });
 }
 
 bool Animation::hasEnded() const
