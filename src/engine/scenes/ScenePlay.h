@@ -17,7 +17,7 @@ public:
     void sDoAction(const Action& action) override;
     
     // systems
-    void sAnimation();
+    void sAnimation(float dt);
     void sMovement(float dt);
     void sEnemySpawner(float dt);
     void sCollision();

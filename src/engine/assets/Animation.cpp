@@ -3,7 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 Animation::Animation(const std::string& name, const sf::Texture& texture, size_t frameCount, int speed, bool isLoopable)
-    : name(name), sprite_(texture), currentFrame(0), frameCount(frameCount), speed(speed), gameFrame(0), bIsLoopable(isLoopable)
+    : name(name), sprite_(texture), currentFrame(0), frameCount(frameCount), speed(speed), animationTick(0.0f), bIsLoopable(isLoopable)
 {
     if (frameCount > 0)
     {
@@ -12,15 +12,19 @@ Animation::Animation(const std::string& name, const sf::Texture& texture, size_t
     }
 }
 
-void Animation::update()
+void Animation::update(float deltaTime)
 {
     if (frameCount == 0 || speed <= 0) return;
     if (!bIsLoopable && hasEnded()) return;
 
-    ++gameFrame;
-    const size_t updatedGameFrame = gameFrame;
-    setFrame(updatedGameFrame / static_cast<size_t>(speed));
-    gameFrame = updatedGameFrame;
+    animationTick += deltaTime;
+    const float frameDuration = 1.0f / static_cast<float>(speed);
+
+    if (animationTick >= frameDuration)
+    {
+        animationTick = 0.0f;
+        setFrame(static_cast<size_t>(currentFrame + 1));
+    }
 }
 
 void Animation::setFrame(size_t frame)
@@ -37,8 +41,11 @@ void Animation::setFrame(size_t frame)
     }
 
     currentFrame = static_cast<int>(frame);
-    gameFrame = frame * static_cast<size_t>(std::max(speed, 0));
     sprite_.setTextureRect(sf::IntRect({currentFrame * size.x, 0}, {size.x, size.y}));
+    sprite_.setOrigin({
+        size.x / 2.0f,
+        size.y / 2.0f
+    });
 }
 
 bool Animation::hasEnded() const

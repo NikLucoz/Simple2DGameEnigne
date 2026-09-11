@@ -6,7 +6,7 @@ class Animation
 { 
     sf::Sprite sprite_;
     size_t frameCount;
-    size_t gameFrame;
+    float animationTick;
     int currentFrame;
     int speed;
     Vector2<int> size;
@@ -14,7 +14,7 @@ class Animation
     bool bIsLoopable;
 public:
     Animation(const std::string& name, const sf::Texture& texture, size_t frameCount, int speed, bool isLoopable);
-    void update();
+    void update(float deltaTime);
     void setFrame(size_t frame);
     bool hasEnded() const;
     sf::Sprite& getSprite();

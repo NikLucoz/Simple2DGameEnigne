@@ -7,7 +7,7 @@ public:
     Vec2f startPosition;
     EPlayer(const std::string& tag, size_t id) : Entity(tag, id)
     {
-        addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(300.0f, 300.0f), 0);
+        addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(300.0f, 300.0f), 0, Vec2f(1,1));
         addComponent<CShape>(30, 12, sf::Color::Black, sf::Color::Red, 5);
         addComponent<CInput>();
         addComponent<CBoundingBox>(Vector2<int>(60,60));
