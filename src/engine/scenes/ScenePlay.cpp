@@ -30,8 +30,10 @@ void ScenePlay::init()
     Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
     player_->getComponent<CTransform>().position = startPos;
     player_->startPosition = startPos;
+    gameEngine_->getCamera().setTarget(startPos);
+    gameEngine_->getCamera().setFollowSmoothing(10.0f);
 
-    //auto& gumba = EntityManager::getInstance().addEntity("enemy");
+    //const auto& gumba = EntityManager::getInstance().addEntity("enemy");
     //gumba->addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(100.0f, 0.0f), 0.0f, Vec2f(6,6));
     //gumba->addComponent<CAnimatedSprite>(gameEngine_->getAssets().getAnimation("gumbaWalkingAnimation"));
     //gumba->addComponent<CBoundingBox>(Vector2<int>(16*6, 16*6));
@@ -118,11 +120,11 @@ void ScenePlay::sRender(float dt)
         }
         
         
-        /*
+        
         if (e.hasComponent<CSprite>())
         {
             CSprite& sprite = e.getComponent<CSprite>();
-            auto& sfSprite = sprite.getTexture();
+            auto& sfSprite = sprite.getSprite();
             sf::Vector2u textureSize = sprite.getTexture().getSize();
             Vec2f desiredSize = sprite.getSize();
             
@@ -138,12 +140,13 @@ void ScenePlay::sRender(float dt)
                 textureSize.x / 2.0f,
                 textureSize.y / 2.0f
             );
+            
             sfSprite.setOrigin(spriteOrigin);
             sfSprite.setPosition(sf::Vector2f(transform.getPosition().x, transform.getPosition().y));
             sfSprite.setRotation(sf::degrees(transform.getRotation()));
             gameEngine_->getWindow().draw(sfSprite);
         }
-        */
+        
     }
     if (gameEngine_->getDebugOptions().showCollisionGeometry) sDebug();
 }
@@ -206,7 +209,8 @@ void ScenePlay::sMovement(float dt)
         transform.position.x += transform.velocity.x * movementDirection.x * dt;
         transform.position.y += transform.velocity.y * movementDirection.y * dt;
     }
-    
+
+    gameEngine_->getCamera().setTarget(player_->getComponent<CTransform>().getPosition());
     
     std::vector<std::string> tags{"bullet", "enemy"};
     auto movable_entities = EntityManager::getInstance().getEntities(tags);

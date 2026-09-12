@@ -25,6 +25,7 @@ struct InputBinding
         return code < other.code;
     }
 };
+
 using ActionMap = std::map<InputBinding, std::string>;
 
 class Scene

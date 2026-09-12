@@ -9,7 +9,7 @@ int main() {
         game_engine.init();
         game_engine.registerScene<MainMenuScene>("main_menu_scene");
         game_engine.registerScene<ScenePlay>("gameplay_scene", 1.0f);
-        game_engine.changeScene("main_menu_scene");
+        game_engine.changeScene("gameplay_scene");
         game_engine.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

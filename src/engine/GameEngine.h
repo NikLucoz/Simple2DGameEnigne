@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "engine/Assets/Assets.h"
+#include "engine/camera/Camera.h"
 #include "engine/utils/debug_ui/DebugUI.h"
 #include "scenes/Scene.h"
 
@@ -16,7 +17,8 @@ class GameEngine
     sf::RenderWindow window_;
     sf::Clock clock_;
     std::string currentScene_;
-    Assets* assets_ = nullptr;
+    std::unique_ptr<Camera> camera_;
+    std::unique_ptr<Assets> assets_;
     DebugUI debugUI_;
     bool bIsRunning_;
     
@@ -30,7 +32,7 @@ class GameEngine
     void handleUserMouseInputEvent(sf::Mouse::Button button, const std::string& actionType);
     
     public:
-    GameEngine() = default;
+    GameEngine();
     GameEngine(unsigned int width = 800, unsigned int height = 600, const std::string& title = "Game Engine");
     
     void init();
@@ -54,6 +56,7 @@ class GameEngine
     }
     
     Assets& getAssets() const;
+    Camera& getCamera() const;
     sf::RenderWindow& getWindow();
     const std::string& getCurrentSceneName() const;
     std::vector<std::string> getSceneNames() const;

@@ -3,16 +3,26 @@
 #include <iostream>
 #include <SFML/Graphics/RectangleShape.hpp>
 
+#include "engine/camera/Camera.h"
 #include "engine/scenes/Scene.h"
+#include "engine/utils/math/Vector2.h"
 #include "entities/EntityManager.h"
 #include "engine/actions/Action.h"
 #include "engine/utils/assets/AssetsLoader.h"
 
+GameEngine::GameEngine()
+    : GameEngine(800, 600, "Game Engine")
+{
+}
+
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
-    : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(new Assets()), scenes_()
+    : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(std::make_unique<Assets>()), scenes_()
 {
     window_.setFramerateLimit(60);
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
+    const float viewHeight = 800;
+    const float viewWidth  = viewHeight * window_.getSize().x / window_.getSize().y;
+    camera_ = std::make_unique<Camera>(Vec2f(viewWidth, viewHeight), Vec2f(500, 500));
 }
 
 void GameEngine::init()
@@ -46,10 +56,11 @@ void GameEngine::update(float deltaTime)
     if (currentScene == nullptr) {
         throw std::runtime_error("Current scene not initialized");
     }
-    
-    EntityManager::getInstance().update();
+
+    EntityManager::getInstance().update();    
     handleEvents();
     currentScene->update(deltaTime);
+
     debugUI_.SetVisible(debugUI_.GetOptions().showDebugUI);
     DebugRuntimeInfo runtimeInfo;
     runtimeInfo.framesPerSecond = deltaTime > 0.0f ? 1.0f / deltaTime : 0.0f;
@@ -60,7 +71,6 @@ void GameEngine::update(float deltaTime)
     runtimeInfo.animations = assets_->getAnimationNames();
     runtimeInfo.sounds = assets_->getSoundNames();
     runtimeInfo.fonts = assets_->getFontNames();
-
     debugUI_.Update(sf::seconds(deltaTime), runtimeInfo, [currentScene]() {
         currentScene->sDebugUI();
     }, [this](const std::string& sceneName) {
@@ -77,8 +87,11 @@ void GameEngine::render(float deltaTime) {
     }
     
     window_.clear(sf::Color::Black);
+    camera_->update(deltaTime);
+    camera_->applyTo(window_);
     drawTestGrid(window_);
     currentScene->sRender(deltaTime);
+    window_.setView(window_.getDefaultView());
     debugUI_.Render();
     window_.display();
 }
@@ -96,6 +109,15 @@ void GameEngine::handleEvents()
         
         if (event->is<sf::Event::Closed>()) {
             quit();
+        }
+
+        if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+            if (resized->size.y > 0) {
+                const float viewHeight = 800.0f;
+                const float viewWidth = viewHeight * static_cast<float>(resized->size.x) /
+                                        static_cast<float>(resized->size.y);
+                camera_->setViewSize(Vec2f(viewWidth, viewHeight));
+            }
         }
         
         if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
@@ -178,6 +200,11 @@ Assets& GameEngine::getAssets() const
     return *assets_;
 }
 
+Camera& GameEngine::getCamera() const
+{
+    return *camera_;
+}
+
 sf::RenderWindow& GameEngine::getWindow()
 {
     return window_;
@@ -202,19 +229,28 @@ void GameEngine::sUserInput()
 
 void GameEngine::drawTestGrid(sf::RenderWindow& window) {
     const float gridSpacing = 64.0f;
-    auto windowSize = window.getSize();
+    const Vec2f cameraPosition = camera_->getPosition();
+    const sf::Vector2f cameraViewSize = camera_->getViewSize();
+
+    const float viewLeft = cameraPosition.x - cameraViewSize.x / 2.0f;
+    const float viewRight = cameraPosition.x + cameraViewSize.x / 2.0f;
+    const float viewTop = cameraPosition.y - cameraViewSize.y / 2.0f;
+    const float viewBottom = cameraPosition.y + cameraViewSize.y / 2.0f;
+
+    const float left = std::floor(viewLeft / gridSpacing) * gridSpacing;
+    const float top = std::floor(viewTop / gridSpacing) * gridSpacing;
 
     const sf::Color blue(28, 27, 30);
     const sf::Color dark_blue(17, 16, 21);
 
-    for (float y = 0; y < windowSize.y; y += gridSpacing) {
-        for (float x = 0; x < windowSize.x; x += gridSpacing) {
+    for (float y = top; y < viewBottom; y += gridSpacing) {
+        for (float x = left; x < viewRight; x += gridSpacing) {
             sf::RectangleShape square({gridSpacing, gridSpacing});
             square.setPosition({x, y});
 
             // Checkerboard pattern
-            const int col = static_cast<int>(x / gridSpacing);
-            const int row = static_cast<int>(y / gridSpacing);
+            const int col = static_cast<int>(std::floor(x / gridSpacing));
+            const int row = static_cast<int>(std::floor(y / gridSpacing));
 
             square.setFillColor((col + row) % 2 == 0 ? blue : dark_blue);
             window.draw(square);
