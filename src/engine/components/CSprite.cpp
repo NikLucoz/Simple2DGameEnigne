@@ -2,7 +2,11 @@
 #include "SFML/Graphics/Sprite.hpp"
 #include <SFML/Graphics/Texture.hpp>
 
-CSprite::CSprite(sf::Texture texture, Vec2f size, Vec2f origin, Vec2f scale, sf::Color color) : sprite_(sf::Sprite(texture))
+CSprite::CSprite() : m_size(0, 0), m_origin(0, 0), m_scale(1, 1), m_color(sf::Color::White)
+{
+}
+
+CSprite::CSprite(const sf::Texture& texture, Vec2f size, Vec2f origin, Vec2f scale, sf::Color color) : sprite_(sf::Sprite(texture))
 {
     m_size = size;
     m_origin = origin;
@@ -26,10 +30,10 @@ Vec2f CSprite::getScale()
 }
 
 sf::Sprite& CSprite::getSprite() {
-    return sprite_;
+    return sprite_.value();
 }
 
 const sf::Texture& CSprite::getTexture()
 {
-    return sprite_.getTexture();
+    return sprite_.value().getTexture();
 }

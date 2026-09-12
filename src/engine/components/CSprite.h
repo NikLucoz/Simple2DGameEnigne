@@ -4,10 +4,11 @@
 #include "SFML/Graphics/Sprite.hpp"
 #include "engine/utils/math/Vector2.h"
 #include "Component.h"
+#include <optional>
 
 class CSprite : public Component
 {
-    sf::Sprite sprite_;
+    std::optional<sf::Sprite> sprite_;
 public:
     Vec2f m_size;
     Vec2f m_origin;
@@ -15,7 +16,7 @@ public:
     sf::Color m_color;
     
     CSprite();
-    CSprite(sf::Texture texture, Vec2f size, Vec2f origin, Vec2f scale, sf::Color color);
+    CSprite(const sf::Texture& texture, Vec2f size, Vec2f origin, Vec2f scale, sf::Color color = sf::Color::White);
     Vec2f getSize();
     Vec2f getOrigin();
     Vec2f getScale();

@@ -9,6 +9,7 @@
 #include "engine/Assets/Assets.h"
 #include "engine/camera/Camera.h"
 #include "engine/utils/debug_ui/DebugUI.h"
+#include "engine/utils/math/Vector2.h"
 #include "scenes/Scene.h"
 
 class GameEngine
@@ -21,6 +22,7 @@ class GameEngine
     std::unique_ptr<Assets> assets_;
     DebugUI debugUI_;
     bool bIsRunning_;
+    Vec2f baseViewSize_;
     
     
     Scene* getCurrentScene()
@@ -62,5 +64,21 @@ class GameEngine
     std::vector<std::string> getSceneNames() const;
     DebugOptions& getDebugOptions() { return debugUI_.GetOptions(); }
     const DebugOptions& getDebugOptions() const { return debugUI_.GetOptions(); }
+    
+    Vec2f getBaseViewSize() const { return baseViewSize_; }
+    void setBaseViewSize(Vec2f newSize) { baseViewSize_ = newSize; }
+    
     void drawTestGrid(sf::RenderWindow& window);
+
+    Vec2f screenToWorldPos(Vec2f screenPosition) const {
+        sf::Vector2i screenPos(static_cast<int>(screenPosition.x), static_cast<int>(screenPosition.y));
+        sf::Vector2f worldPos = camera_->screenToWorld(screenPos, window_);
+        return Vec2f(worldPos.x, worldPos.y);
+    }
+
+    Vec2f worldToScreenPos(Vec2f worldPosition) const {
+        sf::Vector2i screenCoord = camera_->worldToScreen(worldPosition.toSFVector2(), window_);
+        return Vec2f(static_cast<float>(screenCoord.x), static_cast<float>(screenCoord.y));
+    }
+
 };

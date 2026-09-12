@@ -45,6 +45,8 @@ public:
     virtual void sDebug() = 0;
     virtual void sDebugUI() {}
     virtual void sDoAction(const Action& action) = 0;
+
+    void defaultEntityRender(float dt);
     void simulate(int);
     void doAction(const Action& action);
     void registerAction(InputDevice device, int code, const std::string& actionName);

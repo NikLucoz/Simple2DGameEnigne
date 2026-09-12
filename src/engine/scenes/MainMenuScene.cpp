@@ -1,8 +1,13 @@
 #include "MainMenuScene.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
+#include "SFML/Graphics/Color.hpp"
 #include "engine/actions/Action.h"
 #include "ScenePlay.h"
+#include "engine/components/CSprite.h"
+#include "engine/components/CTransform.h"
+#include "engine/entities/EntityManager.h"
+#include "engine/utils/math/Vector2.h"
 
 MainMenuScene::MainMenuScene(GameEngine* gameEngine) : Scene(gameEngine) {
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Enter), "UI_Enter");
@@ -13,6 +18,9 @@ MainMenuScene::MainMenuScene(GameEngine* gameEngine) : Scene(gameEngine) {
 
 void MainMenuScene::init()
 {
+    const auto& card = EntityManager::getInstance().addEntity("card", gameEngine_->getCurrentSceneName(), "Fireball Card");
+    card->addComponent<CTransform>(Vec2f(100, 100), Vec2f(0,0), 0, Vec2f(1,1));
+    card->addComponent<CSprite>(gameEngine_->getAssets().getTexture("fireballCardTexture"), Vec2f(200, 400), Vec2f(0,0), Vec2f(1,1));
 }
 
 void MainMenuScene::destroy()
@@ -25,6 +33,8 @@ void MainMenuScene::update(float dt)
 
 void MainMenuScene::sRender(float dt)
 {
+    gameEngine_->getWindow().setView(gameEngine_->getWindow().getDefaultView());
+    defaultEntityRender(dt);
 }
 
 void MainMenuScene::sDebug()

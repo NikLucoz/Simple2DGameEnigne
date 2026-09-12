@@ -16,13 +16,12 @@ GameEngine::GameEngine()
 }
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
-    : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(std::make_unique<Assets>()), scenes_()
+    : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(std::make_unique<Assets>()), scenes_(), baseViewSize_(800.0f, 600.0f)
 {
     window_.setFramerateLimit(60);
+    setBaseViewSize(Vec2f(width, height));
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
-    const float viewHeight = 800;
-    const float viewWidth  = viewHeight * window_.getSize().x / window_.getSize().y;
-    camera_ = std::make_unique<Camera>(Vec2f(viewWidth, viewHeight), Vec2f(500, 500));
+    camera_ = std::make_unique<Camera>(baseViewSize_, Vec2f(500, 500));
 }
 
 void GameEngine::init()
@@ -113,10 +112,10 @@ void GameEngine::handleEvents()
 
         if (const auto* resized = event->getIf<sf::Event::Resized>()) {
             if (resized->size.y > 0) {
-                const float viewHeight = 800.0f;
-                const float viewWidth = viewHeight * static_cast<float>(resized->size.x) /
-                                        static_cast<float>(resized->size.y);
-                camera_->setViewSize(Vec2f(viewWidth, viewHeight));
+                float scaleX = resized->size.x / baseViewSize_.x;
+                float scaleY = resized->size.y / baseViewSize_.y;
+                float scale = std::min(scaleX, scaleY);
+                camera_->setViewSize(Vec2f(baseViewSize_.x * scale, baseViewSize_.y * scale));
             }
         }
         
