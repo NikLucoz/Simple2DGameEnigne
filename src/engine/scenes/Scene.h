@@ -33,16 +33,16 @@ class Scene
     ActionMap actionMap_;
     bool bIsPaused_ = false;
     bool bHasEnded_ = false;
-protected:
+    protected:
     GameEngine* gameEngine_ = nullptr;
 public:
-    bool bShouldShowDebug_ = true;
-
     explicit Scene(GameEngine* gameEngine);
-    virtual ~Scene() = default;
+    virtual void init() = 0;
+    virtual void destroy() = 0;
     virtual void update(float dt) = 0;
     virtual void sRender(float dt) = 0;
     virtual void sDebug() = 0;
+    virtual void sDebugUI() {}
     virtual void sDoAction(const Action& action) = 0;
     void simulate(int);
     void doAction(const Action& action);

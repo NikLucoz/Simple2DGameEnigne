@@ -11,11 +11,14 @@ class ScenePlay : public Scene
     float enemySpawnMaxTime;
     std::shared_ptr<EPlayer> player_;
     TileMap tilemap_;
+
 public:
     ScenePlay(GameEngine* gameEngine, float enemySpawnTime);
-
+    void init() override;
+    void destroy() override;
     void update(float dt) override;
     void sRender(float dt) override;
+    void sDebugUI() override;
     void sDoAction(const Action& action) override;
     
     // systems

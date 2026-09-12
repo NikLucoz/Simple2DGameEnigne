@@ -1,14 +1,20 @@
 ﻿#include "Scene.h"
 #include "engine/GameEngine.h"
+#include "engine/actions/Action.h"
+#include <SFML/Window/Keyboard.hpp>
 
-Scene::Scene(GameEngine* gameEngine)
-    : gameEngine_(gameEngine)
+Scene::Scene(GameEngine* gameEngine) : gameEngine_(gameEngine)
 {
+	registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::F3), "Toggle_Debug_UI");
 }
 
 void Scene::doAction(const Action &action)
 {
-    // TODO: Extra bookkeeping for actions if needed before forwarding to the specific scene
+    if (action.name() == "Toggle_Debug_UI" && action.type() == "pressed")
+    {
+        gameEngine_->getDebugOptions().showDebugUI = !gameEngine_->getDebugOptions().showDebugUI;
+    }
+
     sDoAction(action);
 }
 
@@ -21,3 +27,4 @@ ActionMap& Scene::getActionMap()
 {
     return actionMap_;
 }
+

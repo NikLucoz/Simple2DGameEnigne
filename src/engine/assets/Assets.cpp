@@ -32,6 +32,7 @@ void Assets::addFont(std::string name, std::string path)
     sf::Font font;
     if (font.openFromFile(path)) {
         fonts_[name] = font;
+        fontPaths_[name] = path;
     }
 }
 
@@ -55,6 +56,17 @@ sf::Font& Assets::getFont(std::string name)
     return fonts_[name];
 }
 
+const std::string& Assets::getFontPath(const std::string& name) const
+{
+    auto it = fontPaths_.find(name);
+    if (it == fontPaths_.end())
+    {
+        throw std::runtime_error("Font not found: " + name);
+    }
+
+    return it->second;
+}
+
 bool Assets::hasAnimation(const std::string& name) const
 {
     return animations_.find(name) != animations_.end();
@@ -69,4 +81,32 @@ Animation& Assets::getAnimation(std::string name)
     }
 
     return it->second;
+}
+
+std::vector<std::string> Assets::getTextureNames() const
+{
+    std::vector<std::string> names;
+    for (const auto& [name, texture] : textures_) names.push_back(name);
+    return names;
+}
+
+std::vector<std::string> Assets::getAnimationNames() const
+{
+    std::vector<std::string> names;
+    for (const auto& [name, animation] : animations_) names.push_back(name);
+    return names;
+}
+
+std::vector<std::string> Assets::getSoundNames() const
+{
+    std::vector<std::string> names;
+    for (const auto& [name, sound] : sounds_) names.push_back(name);
+    return names;
+}
+
+std::vector<std::string> Assets::getFontNames() const
+{
+    std::vector<std::string> names;
+    for (const auto& [name, font] : fonts_) names.push_back(name);
+    return names;
 }

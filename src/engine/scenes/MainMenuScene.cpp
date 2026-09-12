@@ -9,8 +9,14 @@ MainMenuScene::MainMenuScene(GameEngine* gameEngine) : Scene(gameEngine) {
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Escape), "UI_Escape");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Up), "UI_Up");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Down), "UI_Down");
-    
+}
 
+void MainMenuScene::init()
+{
+}
+
+void MainMenuScene::destroy()
+{
 }
 
 void MainMenuScene::update(float dt)

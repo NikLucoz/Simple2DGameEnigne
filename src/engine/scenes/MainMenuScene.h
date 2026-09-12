@@ -7,6 +7,8 @@ class MainMenuScene : public Scene
 { 
     public:
     MainMenuScene(GameEngine* gameEngine);
+    void init() override;
+    void destroy() override;
     void update(float dt) override;
     void sRender(float dt) override;
     void sDebug() override;

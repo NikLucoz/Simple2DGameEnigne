@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <map>
 #include <string>
+#include <vector>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -13,6 +14,7 @@ class Assets
     std::map<std::string, sf::Sound> sounds_;
     std::map<std::string, sf::SoundBuffer> soundBuffers_;
     std::map<std::string, sf::Font> fonts_;
+    std::map<std::string, std::string> fontPaths_;
 public:
     Assets() = default;
     
@@ -24,6 +26,12 @@ public:
     sf::Texture& getTexture(std::string name);
     sf::Sound& getSound(std::string name);
     sf::Font& getFont(std::string name);
+    const std::string& getFontPath(const std::string& name) const;
     bool hasAnimation(const std::string& name) const;
     Animation& getAnimation(std::string name);
+
+    std::vector<std::string> getTextureNames() const;
+    std::vector<std::string> getAnimationNames() const;
+    std::vector<std::string> getSoundNames() const;
+    std::vector<std::string> getFontNames() const;
 };

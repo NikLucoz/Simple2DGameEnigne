@@ -14,7 +14,6 @@ GameEngine::GameEngine(unsigned int width, unsigned int height, const std::strin
     : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(new Assets()), scenes_()
 {
     window_.setFramerateLimit(60);
-    debugUI_.Init(window_);
     init();
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
 }
@@ -25,6 +24,7 @@ void GameEngine::init()
     scenes_["main_menu_scene"] = std::make_shared<MainMenuScene>(this);
     scenes_["gameplay_scene"] = std::make_shared<ScenePlay>(this, 1.0f);
     currentScene_ = "main_menu_scene";
+    debugUI_.Init(window_, *assets_);
 }
 
 void GameEngine::run()
@@ -56,7 +56,23 @@ void GameEngine::update(float deltaTime)
     EntityManager::getInstance().update();
     handleEvents();
     currentScene->update(deltaTime);
-    debugUI_.Update(clock_);
+    debugUI_.SetVisible(debugUI_.GetOptions().showDebugUI);
+    DebugRuntimeInfo runtimeInfo;
+    runtimeInfo.framesPerSecond = deltaTime > 0.0f ? 1.0f / deltaTime : 0.0f;
+    runtimeInfo.windowSize = window_.getSize();
+    runtimeInfo.currentScene = currentScene_;
+    runtimeInfo.loadedScenes = getSceneNames();
+    runtimeInfo.textures = assets_->getTextureNames();
+    runtimeInfo.animations = assets_->getAnimationNames();
+    runtimeInfo.sounds = assets_->getSoundNames();
+    runtimeInfo.fonts = assets_->getFontNames();
+
+    debugUI_.Update(sf::seconds(deltaTime), runtimeInfo, [currentScene]() {
+        currentScene->sDebugUI();
+    }, [this](const std::string& sceneName) {
+        changeScene(sceneName);
+    });
+
     render(deltaTime);
 }
 
@@ -69,7 +85,7 @@ void GameEngine::render(float deltaTime) {
     window_.clear(sf::Color::Black);
     drawTestGrid(window_);
     currentScene->sRender(deltaTime);
-    //debugUI_.Render();
+    debugUI_.Render();
     window_.display();
 }
 
@@ -89,19 +105,27 @@ void GameEngine::handleEvents()
         }
         
         if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-            handleUserKeyboardInputEvent(keyPressed->code, "pressed");
+            if (keyPressed->code == sf::Keyboard::Key::F3 || !debugUI_.WantsKeyboardInput()) {
+                handleUserKeyboardInputEvent(keyPressed->code, "pressed");
+            }
         }
         
         if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
-            handleUserKeyboardInputEvent(keyReleased->code, "released");
+            if (keyReleased->code != sf::Keyboard::Key::F3 && !debugUI_.WantsKeyboardInput()) {
+                handleUserKeyboardInputEvent(keyReleased->code, "released");
+            }
         }
         
         if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-            handleUserMouseInputEvent(mouseButtonPressed->button, "pressed");
+            if (!debugUI_.WantsMouseInput()) {
+                handleUserMouseInputEvent(mouseButtonPressed->button, "pressed");
+            }
         }
         
         if (const auto* mouseButtonReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
-            handleUserMouseInputEvent(mouseButtonReleased->button, "released");
+            if (!debugUI_.WantsMouseInput()) {
+                handleUserMouseInputEvent(mouseButtonReleased->button, "released");
+            }
         }
     }
 }
@@ -146,22 +170,10 @@ void GameEngine::changeScene(const std::string& sceneName)
         std::cout << "Scene '" << sceneName << "' is already the current scene." << std::endl;
         return;
     }
-
+    
+    getCurrentScene()->destroy();
     currentScene_ = sceneName;
-}
-
-void GameEngine::changeScene(const std::string& sceneName, const std::shared_ptr<Scene>& scene)
-{
-    if (scene == nullptr) {
-        throw std::invalid_argument("Scene pointer is null");
-    }
-
-    if (scenes_.find(sceneName) == scenes_.end())
-    {
-        scenes_[sceneName] = scene;
-    }
-
-    changeScene(sceneName);
+    getCurrentScene()->init();
 }
 
 Assets& GameEngine::getAssets() const
@@ -172,6 +184,18 @@ Assets& GameEngine::getAssets() const
 sf::RenderWindow& GameEngine::getWindow()
 {
     return window_;
+}
+
+const std::string& GameEngine::getCurrentSceneName() const
+{
+    return currentScene_;
+}
+
+std::vector<std::string> GameEngine::getSceneNames() const
+{
+    std::vector<std::string> names;
+    for (const auto& [name, scene] : scenes_) names.push_back(name);
+    return names;
 }
 
 void GameEngine::sUserInput()

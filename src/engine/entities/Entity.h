@@ -31,11 +31,14 @@ private:
     ComponentTuple components_;
     bool bIsMarkedForDestruction_ = false;
     std::string tag_ = "default";
+    std::string name_ = "entity";
+    std::string sceneName_ = "default";
     size_t id_ = 0;
 
 protected:
     Entity();
-    Entity(const std::string& tag, size_t id);
+    Entity(const std::string& tag, const std::string& sceneName, size_t id,
+           const std::string& name = "entity");
 
 public:
     
@@ -70,6 +73,8 @@ public:
     size_t getId() const;
     void destroy();
     const std::string& getTag() const;
+    const std::string& getSceneName() const;
+    const std::string& getName() const;
     bool isMarkedForDestruction() const;
     
     // with this only the EntityManager can create Entities since the constructors are private

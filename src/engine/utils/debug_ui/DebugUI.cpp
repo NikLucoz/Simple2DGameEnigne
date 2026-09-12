@@ -6,10 +6,11 @@
 
 #include "engine/entities/EntityManager.h"
 #include "engine/components/CTransform.h"
+#include "engine/Assets/Assets.h"
 
 DebugUI::DebugUI() {}
 
-void DebugUI::Init(sf::RenderWindow& window)
+void DebugUI::Init(sf::RenderWindow& window, const Assets& assets)
 {
 
     Window = &window;
@@ -19,157 +20,236 @@ void DebugUI::Init(sf::RenderWindow& window)
         return;
     }
 
+	initialized_ = true;
+    ImFont* arialFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(assets.getFontPath("fontArial").c_str(), 16.0f);
+    if (arialFont != nullptr)
+    {
+        ImGui::GetIO().FontDefault = arialFont;
+        (void)ImGui::SFML::UpdateFontTexture();
+    }
+
     ImGui::GetStyle().ScaleAllSizes(1.0f);
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowRounding = 6.0f;
+    style.ChildRounding = 4.0f;
+    style.FrameRounding = 4.0f;
+    style.PopupRounding = 4.0f;
+    style.ScrollbarRounding = 4.0f;
+    style.GrabRounding = 4.0f;
+    style.WindowPadding = ImVec2(12.0f, 12.0f);
+    style.FramePadding = ImVec2(8.0f, 5.0f);
 }
 
-void DebugUI::Update(sf::Clock& deltaClock)
+void DebugUI::Update(sf::Time deltaTime, const DebugRuntimeInfo& runtimeInfo,
+    const std::function<void()>& drawSceneContent,
+    const std::function<void(const std::string&)>& changeScene)
 {
-    ImGui::SFML::Update(*Window, deltaClock.restart());
+    frameStarted_ = false;
+    if (!initialized_ || !visible_) return;
 
+    ImGui::SFML::Update(*Window, deltaTime);
+	frameStarted_ = true;
+
+    ImGui::SetNextWindowSize(ImVec2(560.0f, 620.0f), ImGuiCond_FirstUseEver);
     ImGui::Begin("Debug Panel");
 
-    // Creazione della barra delle schede (TabBar)
+    ImGui::TextColored(ImVec4(0.35f, 0.78f, 1.0f, 1.0f), "ENGINE DEBUGGER");
+    ImGui::SameLine();
+    ImGui::TextDisabled("F3 to toggle");
+    ImGui::Separator();
+
     if (ImGui::BeginTabBar("DebugTabBar"))
     {
-        // --------------------------------------------------
-        // TAB 1: SYSTEM
-        // --------------------------------------------------
-        /*
-        * if (ImGui::BeginTabItem("System"))
+        if (ImGui::BeginTabItem("Overview"))
         {
-            bool isMovementActive = MovementSystem::getInstance().bIsActive_;
-            if (ImGui::Checkbox("Movement System", &isMovementActive)) {
-                MovementSystem::getInstance().bIsActive_ = isMovementActive;
-            }
+            ImGui::Text("Runtime");
+            ImGui::Spacing();
 
-            bool isCollisionActive = CollisionSystem::getInstance().bIsActive_;
-            if (ImGui::Checkbox("Collision System", &isCollisionActive)) {
-                CollisionSystem::getInstance().bIsActive_ = isCollisionActive;
-            }
-
-            if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
+            auto& entities = EntityManager::getInstance().getEntities();
+            if (ImGui::BeginTable("overview_metrics", 3, ImGuiTableFlags_SizingStretchSame))
             {
-                ImGui::Indent();
-                bool isRenderActive = RenderSystem::getInstance().bIsActive_;
-                if (ImGui::Checkbox("Render System", &isRenderActive)) {
-                    RenderSystem::getInstance().bIsActive_ = isRenderActive;
-                }
-
-                bool shouldRenderDebug = RenderSystem::getInstance().bDrawDebug_;
-                if (ImGui::Checkbox("Show debug", &shouldRenderDebug)) {
-                    RenderSystem::getInstance().bDrawDebug_ = shouldRenderDebug;
-                }
-                ImGui::Unindent();
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::TextDisabled("Frame rate");
+                ImGui::Text("%.1f FPS", runtimeInfo.framesPerSecond);
+                ImGui::TableSetColumnIndex(1);
+                ImGui::TextDisabled("Resolution");
+                ImGui::Text("%u x %u", runtimeInfo.windowSize.x, runtimeInfo.windowSize.y);
+                ImGui::TableSetColumnIndex(2);
+                ImGui::TextDisabled("Entities");
+                ImGui::Text("%d", static_cast<int>(entities.size()));
+                ImGui::EndTable();
             }
 
-            bool isLifespanActive = LifeSpanSystem::getInstance().bIsActive_;
-            if (ImGui::Checkbox("LifeSpanSystem System", &isLifespanActive)) {
-                LifeSpanSystem::getInstance().bIsActive_ = isLifespanActive;
+            ImGui::Spacing();
+            ImGui::SeparatorText("Scene");
+            ImGui::Text("Current: %s", runtimeInfo.currentScene.c_str());
+            if (ImGui::BeginChild("loaded_scenes", ImVec2(0.0f, 66.0f), true))
+            {
+                if (ImGui::BeginTable("loaded_scene_rows", 2, ImGuiTableFlags_SizingStretchProp))
+                {
+                    ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 58.0f);
+                    ImGui::TableSetupColumn("Scene", ImGuiTableColumnFlags_WidthStretch);
+
+                    for (const auto& scene : runtimeInfo.loadedScenes)
+                    {
+                        const bool isCurrent = scene == runtimeInfo.currentScene;
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        if (!isCurrent && ImGui::Button(("Load##" + scene).c_str()) && changeScene)
+                        {
+                            changeScene(scene);
+                        }
+                        else if (isCurrent)
+                        {
+                            ImGui::TextDisabled("Active");
+                        }
+
+                        ImGui::TableSetColumnIndex(1);
+                        if (isCurrent) ImGui::TextColored(ImVec4(0.35f, 0.78f, 1.0f, 1.0f), "%s", scene.c_str());
+                        else ImGui::TextUnformatted(scene.c_str());
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::EndChild();
             }
 
-            bool isEnemySpawnActive = EnemySpawnSystem::getInstance().bIsActive_;
-            if (ImGui::Checkbox("EnemySpawn System", &isEnemySpawnActive)) {
-                EnemySpawnSystem::getInstance().bIsActive_ = isEnemySpawnActive;
+            ImGui::Spacing();
+            ImGui::SeparatorText("Loaded assets");
+            if (ImGui::BeginTable("asset_summary", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchSame))
+            {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("Textures\n%d", static_cast<int>(runtimeInfo.textures.size()));
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("Animations\n%d", static_cast<int>(runtimeInfo.animations.size()));
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("Sounds\n%d", static_cast<int>(runtimeInfo.sounds.size()));
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("Fonts\n%d", static_cast<int>(runtimeInfo.fonts.size()));
+                ImGui::EndTable();
+            }
+
+            if (ImGui::CollapsingHeader("Asset names"))
+            {
+                const auto drawAssetGroup = [](const char* label, const std::vector<std::string>& names)
+                {
+                    if (ImGui::TreeNode(label))
+                    {
+                        if (names.empty()) ImGui::TextDisabled("None loaded");
+                        for (const auto& name : names) ImGui::BulletText("%s", name.c_str());
+                        ImGui::TreePop();
+                    }
+                };
+
+                drawAssetGroup("Textures", runtimeInfo.textures);
+                drawAssetGroup("Animations", runtimeInfo.animations);
+                drawAssetGroup("Sounds", runtimeInfo.sounds);
+                drawAssetGroup("Fonts", runtimeInfo.fonts);
             }
 
             ImGui::EndTabItem();
         }
-         */
 
-        // --------------------------------------------------
-        // TAB 2: ENTITIES
-        // --------------------------------------------------
         if (ImGui::BeginTabItem("Entities"))
         {
-            // Raggruppa le entità per tag
             auto& entities = EntityManager::getInstance().getEntities();
             std::map<std::string, EntityVec> entitiesByTag;
-            for (auto& e : entities) {
+            std::map<std::string, EntityVec> entitiesByScene;
+            for (const auto& e : entities) {
                 entitiesByTag[e->getTag()].push_back(e);
+                entitiesByScene[e->getSceneName()].push_back(e);
             }
 
-            if (ImGui::CollapsingHeader("Entities by Tags", ImGuiTreeNodeFlags_DefaultOpen))
+            static int entityViewMode = 0;
+            const char* entityViewModes[] = { "All", "By scene", "By tag" };
+            ImGui::TextDisabled("%d entities", static_cast<int>(entities.size()));
+            ImGui::SetNextItemWidth(180.0f);
+            ImGui::Combo("View", &entityViewMode, entityViewModes, IM_ARRAYSIZE(entityViewModes));
+            ImGui::Checkbox("Show entity IDs", &options_.showEntityIds);
+
+            const auto drawEntityTable = [](const char* tableId, const EntityVec& tableEntities)
             {
-                ImGui::Indent();
-                for (auto& pair : entitiesByTag)
+                if (!ImGui::BeginTable(tableId, 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+                {
+                    return;
+                }
+
+                ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 50.0f);
+                ImGui::TableSetupColumn("ID");
+                ImGui::TableSetupColumn("Name");
+                ImGui::TableSetupColumn("Tag");
+                ImGui::TableSetupColumn("Scene");
+                ImGui::TableSetupColumn("Position");
+                ImGui::TableSetupColumn("Velocity");
+                ImGui::TableSetupColumn("Rotation");
+                ImGui::TableHeadersRow();
+
+                for (const auto& entity : tableEntities)
+                {
+                    ImGui::TableNextRow();
+
+                    ImGui::TableSetColumnIndex(0);
+                    std::string buttonName = "D##" + std::to_string(entity->getId());
+                    if (ImGui::Button(buttonName.c_str(), ImVec2(40.0f, 0.0f)))
+                    {
+                        entity->destroy();
+                    }
+
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("%d", static_cast<int>(entity->getId()));
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::Text("%s", entity->getName().c_str());
+                    ImGui::TableSetColumnIndex(3);
+                    ImGui::Text("%s", entity->getTag().c_str());
+                    ImGui::TableSetColumnIndex(4);
+                    ImGui::Text("%s", entity->getSceneName().c_str());
+
+                    auto& transform = entity->getComponent<CTransform>();
+                    ImGui::TableSetColumnIndex(5);
+                    ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
+                    ImGui::TableSetColumnIndex(6);
+                    ImGui::Text("(%.1f, %.1f)", transform.velocity.x, transform.velocity.y);
+                    ImGui::TableSetColumnIndex(7);
+                    ImGui::Text("%.1f", transform.rotation);
+                }
+
+                ImGui::EndTable();
+            };
+
+            if (entityViewMode == 0 || entityViewMode == 1)
+            {
+                const auto& entitiesBy = entityViewMode == 0 ? entitiesByTag : entitiesByScene;
+                const char* groupLabel = entityViewMode == 0 ? "tag" : "scene";
+                for (const auto& pair : entitiesBy)
                 {
                     std::string name = pair.first + " Entities (" + std::to_string(pair.second.size()) + ")";
-
-                    if (ImGui::CollapsingHeader(name.c_str()))
+                    if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen) && !pair.second.empty())
                     {
-                        if (!pair.second.empty()) {
-                            if (ImGui::BeginTable(pair.first.c_str(), 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-                            {
-                                ImGui::TableSetupColumn("ID");
-                                ImGui::TableSetupColumn("Tag");
-                                ImGui::TableSetupColumn("Position");
-                                ImGui::TableHeadersRow();
-
-                                for (size_t i = 0; i < pair.second.size(); i++)
-                                {
-                                    ImGui::TableNextRow();
-
-                                    ImGui::TableSetColumnIndex(0);
-                                    ImGui::Text("%d", (int)pair.second[i]->getId());
-
-                                    ImGui::TableSetColumnIndex(1);
-                                    ImGui::Text("%s", pair.first.c_str());
-
-                                    auto& transform = pair.second[i]->getComponent<CTransform>();
-
-                                    ImGui::TableSetColumnIndex(2);
-                                    ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
-                                }
-
-                                ImGui::EndTable();
-                            }
-                        }
+                        std::string tableId = "entities_by_" + std::string(groupLabel) + "##" + pair.first;
+                        drawEntityTable(tableId.c_str(), pair.second);
                     }
                 }
-                ImGui::Unindent();
             }
-
-            if (ImGui::CollapsingHeader("All Entities", ImGuiTreeNodeFlags_DefaultOpen))
+            else
             {
-                if (ImGui::BeginTable("all_entities_table", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+                if (entities.empty())
                 {
-                    ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 50);
-                    ImGui::TableSetupColumn("ID");
-                    ImGui::TableSetupColumn("Tag");
-                    ImGui::TableSetupColumn("Position");
-                    ImGui::TableSetupColumn("Velocity");
-                    ImGui::TableSetupColumn("Rotation");
-                    ImGui::TableHeadersRow();
-
-                    for (size_t i = 0; i < entities.size(); i++)
-                    {
-                        ImGui::TableNextRow();
-
-                        ImGui::TableSetColumnIndex(0);
-                        std::string btnName = "D##" + std::to_string(entities[i]->getId());
-                        if (ImGui::Button(btnName.c_str(), ImVec2(40, 0))) {
-                            entities[i]->destroy();
-                        }
-
-                        ImGui::TableSetColumnIndex(1);
-                        ImGui::Text("%d", (int)entities[i]->getId());
-
-                        ImGui::TableSetColumnIndex(2);
-                        ImGui::Text("%s", entities[i]->getTag().c_str());
-
-                        auto& transform = entities[i]->getComponent<CTransform>();
-
-                        ImGui::TableSetColumnIndex(3);
-                        ImGui::Text("(%.1f, %.1f)", transform.position.x, transform.position.y);
-                        ImGui::TableSetColumnIndex(4);
-                        ImGui::Text("(%.1f, %.1f)", transform.velocity.x, transform.velocity.y);
-                        ImGui::TableSetColumnIndex(5);
-                        ImGui::Text("%.1f", transform.rotation);
-                    }
-                    ImGui::EndTable();
+                    ImGui::TextDisabled("No entities in the active scene.");
+                }
+                else
+                {
+                    drawEntityTable("all_entities_table", entities);
                 }
             }
 
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Scene"))
+        {
+            if (drawSceneContent) drawSceneContent();
             ImGui::EndTabItem();
         }
 
@@ -181,15 +261,45 @@ void DebugUI::Update(sf::Clock& deltaClock)
 
 void DebugUI::Render()
 {
-    ImGui::SFML::Render(*Window);
+    if (initialized_ && frameStarted_) ImGui::SFML::Render(*Window);
 }
 
 void DebugUI::ProcessEvent(sf::Event& event)
 {
-    ImGui::SFML::ProcessEvent(*Window, event);
+    if (initialized_) ImGui::SFML::ProcessEvent(*Window, event);
+}
+
+void DebugUI::SetVisible(bool visible)
+{
+    visible_ = visible;
+}
+
+bool DebugUI::IsVisible() const
+{
+    return visible_;
+}
+
+bool DebugUI::WantsKeyboardInput() const
+{
+    return initialized_ && visible_ && ImGui::GetIO().WantCaptureKeyboard;
+}
+
+bool DebugUI::WantsMouseInput() const
+{
+    return initialized_ && visible_ && ImGui::GetIO().WantCaptureMouse;
 }
 
 bool DebugUI::GetAnyItemHovered()
 {
-    return ImGui::IsAnyItemHovered();
+    return initialized_ && visible_ && ImGui::IsAnyItemHovered();
+}
+
+DebugOptions& DebugUI::GetOptions()
+{
+    return options_;
+}
+
+const DebugOptions& DebugUI::GetOptions() const
+{
+    return options_;
 }

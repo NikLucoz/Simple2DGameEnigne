@@ -2,6 +2,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "engine/Assets/Assets.h"
@@ -38,10 +39,13 @@ public:
     void update(float deltaTime);
     void render(float deltaTime);
     void changeScene(const std::string& sceneName);
-    void changeScene(const std::string& sceneName, const std::shared_ptr<Scene>& scene);
     void sUserInput();
     
     Assets& getAssets() const;
     sf::RenderWindow& getWindow();
+    const std::string& getCurrentSceneName() const;
+    std::vector<std::string> getSceneNames() const;
+    DebugOptions& getDebugOptions() { return debugUI_.GetOptions(); }
+    const DebugOptions& getDebugOptions() const { return debugUI_.GetOptions(); }
     void drawTestGrid(sf::RenderWindow& window);
 };

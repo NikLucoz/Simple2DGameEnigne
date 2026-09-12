@@ -8,9 +8,9 @@ EntityManager& EntityManager::getInstance()
     return instance;
 }
 
-std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
+std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag, const std::string& sceneName, const std::string& entityName)
 {
-    auto e = std::shared_ptr<Entity>(new Entity(tag, totalEntities_++));
+    auto e = std::shared_ptr<Entity>(new Entity(tag, sceneName, totalEntities_++, entityName));
     toAdd_.push_back(e);
     return e;
 }
@@ -21,6 +21,7 @@ void EntityManager::update()
     {
         entities_.push_back(e);
         entitiesMap_[e->getTag()].push_back(e);
+        entitiesSceneMap_[e->getSceneName()].push_back(e);
     }
 
     std::vector<std::shared_ptr<Entity>> toRemove;
@@ -45,6 +46,16 @@ void EntityManager::update()
     
         if (entitiesMap_[e->getTag()].empty()) {
             entitiesMap_.erase(e->getTag());
+        }
+
+        auto& sceneEntities = entitiesSceneMap_[e->getSceneName()];
+        auto sceneIt = std::find(sceneEntities.begin(), sceneEntities.end(), e);
+        if (sceneIt != sceneEntities.end()) {
+            sceneEntities.erase(sceneIt);
+        }
+
+        if (sceneEntities.empty()) {
+            entitiesSceneMap_.erase(e->getSceneName());
         }
     }
     
@@ -73,4 +84,9 @@ EntityVec EntityManager::getEntities(const std::vector<std::string>& tags)
         }
     }
     return entities;
+}
+
+EntityVec& EntityManager::getEntitiesInScene(const std::string& sceneName)
+{
+    return entitiesSceneMap_[sceneName];
 }

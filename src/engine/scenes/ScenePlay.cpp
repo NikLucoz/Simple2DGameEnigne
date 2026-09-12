@@ -1,6 +1,7 @@
 ﻿#include "ScenePlay.h"
 
 #include <iostream>
+#include <imgui.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics.hpp>
 #include "engine/actions/Action.h"
@@ -13,29 +14,40 @@
 ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameEngine), enemySpawnMaxTime(enemySpawnTime)
 {
     elapsedTimeSinceLastEnemySpawn_ = enemySpawnTime;
-    tilemap_ = TileMapLoader::load("game/levels/example_level.cfg");
-
-    player_ = EntityManager::getInstance().addEntity<EPlayer>("player");
-    Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
-    player_->getComponent<CTransform>().position = startPos;
-    player_->startPosition = startPos;
-
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::W), "Move_Up");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::S), "Move_Down");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::A), "Move_Left");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::D), "Move_Right");
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Left), "Shoot");
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Right), "SpecialShoot");
+}
+
+void ScenePlay::init()
+{
+    tilemap_ = TileMapLoader::load("game/levels/example_level.cfg");
+
+    player_ = EntityManager::getInstance().addEntity<EPlayer>("player", gameEngine_->getCurrentSceneName(), "PlayerEntity");
+    Vec2f startPos = Vec2f(gameEngine_->getWindow().getSize().x / 2, gameEngine_->getWindow().getSize().y / 2);
+    player_->getComponent<CTransform>().position = startPos;
+    player_->startPosition = startPos;
 
     //auto& gumba = EntityManager::getInstance().addEntity("enemy");
     //gumba->addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(100.0f, 0.0f), 0.0f, Vec2f(6,6));
     //gumba->addComponent<CAnimatedSprite>(gameEngine_->getAssets().getAnimation("gumbaWalkingAnimation"));
     //gumba->addComponent<CBoundingBox>(Vector2<int>(16*6, 16*6));
 
-    auto e = EntityManager::getInstance().addEntity("enemy");
+    auto e = EntityManager::getInstance().addEntity("enemy", gameEngine_->getCurrentSceneName(), "EnemyRaycastTest");
     e->addComponent<CTransform>(Vec2f(600, 600), Vec2f(0, 0), 0, Vec2f(1,1));
     e->addComponent<CShape>(25, 4, sf::Color::Green, sf::Color::White, 4);
     e->addComponent<CBoundingBox>(Vector2<int>(50,50));
+}
+
+void ScenePlay::destroy()
+{
+    for (auto& ePtr : EntityManager::getInstance().getEntitiesInScene(gameEngine_->getCurrentSceneName())) {
+        Entity& e = *ePtr;
+        e.destroy();
+    }
 }
 
 void ScenePlay::update(float dt)
@@ -43,7 +55,7 @@ void ScenePlay::update(float dt)
     sMovement(dt);
     sCollision();
     sLifespan(dt);
-    //sEnemySpawner(dt);
+    sEnemySpawner(dt);
     sAnimation(dt);
 
     auto hit = Raycast2D::castRay(
@@ -55,7 +67,9 @@ void ScenePlay::update(float dt)
 }
 
 void ScenePlay::sRender(float dt)
-{   
+{
+    if (!gameEngine_->getDebugOptions().systems.render) return;
+
     tilemap_.drawLayer(gameEngine_->getWindow(), gameEngine_->getAssets(), tilemap_.getLayer("ground"));
 
     for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
@@ -87,6 +101,21 @@ void ScenePlay::sRender(float dt)
             sprite.setScale(transform.getScale().toSFVector2());
             gameEngine_->getWindow().draw(sprite);
         }
+
+        if (gameEngine_->getDebugOptions().showEntityIds)
+        {
+            sf::Text entityIdText(
+                gameEngine_->getAssets().getFont("fontArial"),
+                std::to_string(e.getId()),
+                14
+            );
+            entityIdText.setOrigin({7.0f, 14.0f});
+            entityIdText.setPosition({pos.x, pos.y - 40.0f});
+            entityIdText.setFillColor(sf::Color::White);
+            entityIdText.setOutlineColor(sf::Color::Black);
+            entityIdText.setOutlineThickness(1.0f);
+            gameEngine_->getWindow().draw(entityIdText);
+        }
         
         
         /*
@@ -116,8 +145,7 @@ void ScenePlay::sRender(float dt)
         }
         */
     }
-    if (bShouldShowDebug_) sDebug();
-
+    if (gameEngine_->getDebugOptions().showCollisionGeometry) sDebug();
 }
 
 void ScenePlay::sDoAction(const Action& action)
@@ -155,6 +183,8 @@ void ScenePlay::sDoAction(const Action& action)
 
 void ScenePlay::sAnimation(float dt)
 {
+    if (!gameEngine_->getDebugOptions().systems.animation) return;
+
     for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
     if (ePtr->hasComponent<CAnimatedSprite>()) {
         auto& cAnimatedSprite = ePtr->getComponent<CAnimatedSprite>();
@@ -164,6 +194,8 @@ void ScenePlay::sAnimation(float dt)
 
 void ScenePlay::sMovement(float dt)
 {    
+    if (!gameEngine_->getDebugOptions().systems.movement) return;
+
     if (player_ == nullptr) return;
    
     auto& input = player_->getComponent<CInput>();
@@ -221,6 +253,8 @@ void ScenePlay::sMovement(float dt)
 
 void ScenePlay::sEnemySpawner(float dt)
 {
+    if (!gameEngine_->getDebugOptions().systems.enemySpawner) return;
+
     elapsedTimeSinceLastEnemySpawn_ -= dt;
     if (elapsedTimeSinceLastEnemySpawn_ <= 0.0f) {
         srand(time(0)*dt);
@@ -238,7 +272,7 @@ void ScenePlay::sEnemySpawner(float dt)
         int g = rand() % 255;
         int b = rand() % 255;
 
-        auto e = EntityManager::getInstance().addEntity("enemy");
+        auto e = EntityManager::getInstance().addEntity("enemy", gameEngine_->getCurrentSceneName(), "MovingEnemy");
         e->addComponent<CTransform>(Vec2f(randomX, randomY), Vec2f(velX, velY), 0, Vec2f(1,1));
         e->addComponent<CShape>(25, randomPoints, sf::Color(r, g, b), sf::Color::White, 4);
         e->addComponent<CBoundingBox>(Vector2<int>(50,50));
@@ -249,6 +283,8 @@ void ScenePlay::sEnemySpawner(float dt)
 
 void ScenePlay::sCollision()
 {
+    if (!gameEngine_->getDebugOptions().systems.collision) return;
+
     auto& enemies = EntityManager::getInstance().getEntities("enemy");
     
     std::vector<std::string> tags{"bullet", "specialBullet"};
@@ -306,6 +342,8 @@ void ScenePlay::sCollision()
 
 void ScenePlay::sLifespan(float dt)
 {
+    if (!gameEngine_->getDebugOptions().systems.lifespan) return;
+
     auto& entities = EntityManager::getInstance().getEntities();
     
     for (auto& entity : entities)
@@ -333,6 +371,30 @@ void ScenePlay::sLifespan(float dt)
     }
 }
 
+void ScenePlay::spawnEnemyDeathParticles(Entity* enemy)
+{
+    if (enemy->hasComponent<CShape>())
+    {
+        auto& cShape = enemy->getComponent<CShape>();
+        auto& eTransform = enemy->getComponent<CTransform>();
+
+        float angleStep = 360.0f / cShape.point_count_;
+        for (int i = 0; i < cShape.point_count_; ++i)
+        {
+            float angle = i * angleStep;
+            angle += angleStep/2;
+            float radiandAngles = sf::degrees(angle).asRadians();
+            auto velX = std::cosf(radiandAngles) * 300;
+            auto velY = -1 * std::sinf(radiandAngles) * 300;
+
+            std::shared_ptr<Entity> enemyParticle = EntityManager::getInstance().addEntity("enemy", gameEngine_->getCurrentSceneName(), "EnemyDeathParticle");
+            enemyParticle->addComponent<CShape>(10, cShape.point_count_, cShape.fillColor_, cShape.outlineColor_, 2);
+            enemyParticle->addComponent<CLifespan>(0.4);
+            enemyParticle->addComponent<CTransform>(eTransform.getPosition(), Vec2f(velX, velY), eTransform.getRotation(), Vec2f(1,1));
+        }
+    }
+}
+
 void ScenePlay::sDebug()
 {
     for (std::shared_ptr<Entity>& ePtr : EntityManager::getInstance().getEntities())
@@ -355,7 +417,7 @@ void ScenePlay::sDebug()
                 gameEngine_->getWindow().draw(sfShape);
             }
             
-            if (e.hasComponent<CBoundingBox>())
+            if (gameEngine_->getDebugOptions().showCollisionGeometry && e.hasComponent<CBoundingBox>())
             {
                 CBoundingBox& b = e.getComponent<CBoundingBox>();
                 sf::RectangleShape sfShape;
@@ -369,7 +431,7 @@ void ScenePlay::sDebug()
         }
     }
     
-    auto& player_pos = player_->getComponent<CTransform>().getPosition();
+    const auto& player_pos = player_->getComponent<CTransform>().getPosition();
     const Vec2f end = player_pos + Vec2f::RIGHT() * 100.0f;
     sf::VertexArray ray(sf::PrimitiveType::Lines, 2);
     ray[0].position = sf::Vector2f(player_pos.x, player_pos.y);
@@ -379,26 +441,29 @@ void ScenePlay::sDebug()
     gameEngine_->getWindow().draw(ray);
 }
 
-void ScenePlay::spawnEnemyDeathParticles(Entity* enemy)
+void ScenePlay::sDebugUI()
 {
-    if (enemy->hasComponent<CShape>())
+    ImGui::Text("Gameplay scene");
+    ImGui::TextDisabled("Toggle runtime systems without restarting the scene.");
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("Simulation", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        auto& cShape = enemy->getComponent<CShape>();
-        auto& eTransform = enemy->getComponent<CTransform>();
+        ImGui::Checkbox("Movement system", &gameEngine_->getDebugOptions().systems.movement);
+        ImGui::Checkbox("Collision system", &gameEngine_->getDebugOptions().systems.collision);
+        ImGui::Checkbox("Lifespan system", &gameEngine_->getDebugOptions().systems.lifespan);
+        ImGui::Checkbox("Animation system", &gameEngine_->getDebugOptions().systems.animation);
+        ImGui::Checkbox("Enemy spawner", &gameEngine_->getDebugOptions().systems.enemySpawner);
+    }
 
-        float angleStep = 360.0f / cShape.point_count_;
-        for (int i = 0; i < cShape.point_count_; ++i)
-        {
-            float angle = i * angleStep;
-            angle += angleStep/2;
-            float radiandAngles = sf::degrees(angle).asRadians();
-            auto velX = std::cosf(radiandAngles) * 300;
-            auto velY = -1 * std::sinf(radiandAngles) * 300;
+    if (ImGui::CollapsingHeader("Rendering", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Checkbox("Render system", &gameEngine_->getDebugOptions().systems.render);
+        ImGui::Checkbox("Collision debug geometry", &gameEngine_->getDebugOptions().showCollisionGeometry);
+    }
 
-            std::shared_ptr<Entity> enemyParticle = EntityManager::getInstance().addEntity("enemy");
-            enemyParticle->addComponent<CShape>(10, cShape.point_count_, cShape.fillColor_, cShape.outlineColor_, 2);
-            enemyParticle->addComponent<CLifespan>(0.4);
-            enemyParticle->addComponent<CTransform>(eTransform.getPosition(), Vec2f(velX, velY), eTransform.getRotation(), Vec2f(1,1));
-        }
+    if (ImGui::CollapsingHeader("Diagnostics"))
+    {
+        ImGui::TextDisabled("More scene counters and profilers can be added here.");
     }
 }
