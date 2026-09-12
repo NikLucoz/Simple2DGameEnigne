@@ -8,6 +8,7 @@
 #include "engine/entities/EPlayer.h"
 #include "engine/utils/physics/CollisionUtils.h"
 #include <engine/utils/assets/TileMapLoader.h>
+#include <engine/utils/physics/Raycast2D.h>
 
 ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameEngine), enemySpawnMaxTime(enemySpawnTime)
 {
@@ -26,10 +27,15 @@ ScenePlay::ScenePlay(GameEngine* gameEngine, float enemySpawnTime) : Scene(gameE
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Left), "Shoot");
     registerAction(InputDevice::MouseButton, static_cast<int>(sf::Mouse::Button::Right), "SpecialShoot");
 
-    auto& gumba = EntityManager::getInstance().addEntity("enemy");
-    gumba->addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(100.0f, 0.0f), 0.0f, Vec2f(6,6));
-    gumba->addComponent<CAnimatedSprite>(gameEngine_->getAssets().getAnimation("gumbaWalkingAnimation"));
-    gumba->addComponent<CBoundingBox>(Vector2<int>(16*6, 16*6));
+    //auto& gumba = EntityManager::getInstance().addEntity("enemy");
+    //gumba->addComponent<CTransform>(Vec2f(300.0f, 300.0f), Vec2f(100.0f, 0.0f), 0.0f, Vec2f(6,6));
+    //gumba->addComponent<CAnimatedSprite>(gameEngine_->getAssets().getAnimation("gumbaWalkingAnimation"));
+    //gumba->addComponent<CBoundingBox>(Vector2<int>(16*6, 16*6));
+
+    auto e = EntityManager::getInstance().addEntity("enemy");
+    e->addComponent<CTransform>(Vec2f(600, 600), Vec2f(0, 0), 0, Vec2f(1,1));
+    e->addComponent<CShape>(25, 4, sf::Color::Green, sf::Color::White, 4);
+    e->addComponent<CBoundingBox>(Vector2<int>(50,50));
 }
 
 void ScenePlay::update(float dt)
@@ -39,7 +45,13 @@ void ScenePlay::update(float dt)
     sLifespan(dt);
     //sEnemySpawner(dt);
     sAnimation(dt);
-    if (bShouldShowDebug_) sDebug();
+
+    auto hit = Raycast2D::castRay(
+        player_->getComponent<CTransform>().getPosition(),
+        Vec2f::RIGHT(),
+        100.0f,
+        player_.get()
+    );
 }
 
 void ScenePlay::sRender(float dt)
@@ -104,7 +116,8 @@ void ScenePlay::sRender(float dt)
         }
         */
     }
-    sDebug();
+    if (bShouldShowDebug_) sDebug();
+
 }
 
 void ScenePlay::sDoAction(const Action& action)
@@ -355,6 +368,15 @@ void ScenePlay::sDebug()
             }
         }
     }
+    
+    auto& player_pos = player_->getComponent<CTransform>().getPosition();
+    const Vec2f end = player_pos + Vec2f::RIGHT() * 100.0f;
+    sf::VertexArray ray(sf::PrimitiveType::Lines, 2);
+    ray[0].position = sf::Vector2f(player_pos.x, player_pos.y);
+    ray[0].color = sf::Color::Red;
+    ray[1].position = sf::Vector2f(end.x, end.y);
+    ray[1].color = sf::Color::Red;
+    gameEngine_->getWindow().draw(ray);
 }
 
 void ScenePlay::spawnEnemyDeathParticles(Entity* enemy)

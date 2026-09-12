@@ -36,7 +36,7 @@ class Scene
 protected:
     GameEngine* gameEngine_ = nullptr;
 public:
-    bool bShouldShowDebug_ = false;
+    bool bShouldShowDebug_ = true;
 
     explicit Scene(GameEngine* gameEngine);
     virtual ~Scene() = default;

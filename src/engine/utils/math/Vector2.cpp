@@ -111,6 +111,12 @@ std::string Vector2<T>::toString() const
     return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
 }
 
+template <class T>
+float Vector2<T>::crossProduct(const Vector2<T>& other) const
+{
+    return static_cast<float>(this->x * other.y - this->y * other.x);
+}
+
 template class Vector2<float>;
 template class Vector2<int>;
 template class Vector2<double>;

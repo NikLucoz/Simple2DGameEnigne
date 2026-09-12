@@ -8,7 +8,9 @@ MainMenuScene::MainMenuScene(GameEngine* gameEngine) : Scene(gameEngine) {
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Enter), "UI_Enter");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Escape), "UI_Escape");
     registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Up), "UI_Up");
-    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Down), "UI_Down");    
+    registerAction(InputDevice::Keyboard, static_cast<int>(sf::Keyboard::Key::Down), "UI_Down");
+    
+
 }
 
 void MainMenuScene::update(float dt)

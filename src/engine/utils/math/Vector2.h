@@ -27,7 +27,27 @@ public:
     float distanceToSquared(Vector2<T> other) const;
     Vector2<T> reflectionVector(const Vector2<T>& normal);
     std::string toString() const;
+    float crossProduct(const Vector2<T>& other) const;
 
+        static constexpr Vector2<T> RIGHT()
+    {
+        return Vector2<T>(1, 0);
+    }
+
+    static constexpr Vector2<T> LEFT()
+    {
+        return Vector2<T>(-1, 0);
+    }
+
+    static constexpr Vector2<T> UP()
+    {
+        return Vector2<T>(0, -1);
+    }
+
+    static constexpr Vector2<T> DOWN()
+    {
+        return Vector2<T>(0, 1);
+    }
 };
 
 using Vec2f = Vector2<float>;
