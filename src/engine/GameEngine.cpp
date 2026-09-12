@@ -5,25 +5,19 @@
 
 #include "engine/scenes/Scene.h"
 #include "entities/EntityManager.h"
-#include "scenes/ScenePlay.h"
 #include "engine/actions/Action.h"
-#include "engine/scenes/MainMenuScene.h"
 #include "engine/utils/assets/AssetsLoader.h"
 
 GameEngine::GameEngine(unsigned int width, unsigned int height, const std::string& title)
     : window_(sf::VideoMode({width, height}), title), bIsRunning_(false), assets_(new Assets()), scenes_()
 {
     window_.setFramerateLimit(60);
-    init();
     std::cout << "Engine initialized: " << width << "x" << height << std::endl;
 }
 
 void GameEngine::init()
 {
     AssetsLoader::loadAssetsFromFile(*assets_, "game/assets/assets.cfg");
-    scenes_["main_menu_scene"] = std::make_shared<MainMenuScene>(this);
-    scenes_["gameplay_scene"] = std::make_shared<ScenePlay>(this, 1.0f);
-    currentScene_ = "main_menu_scene";
     debugUI_.Init(window_, *assets_);
 }
 
@@ -166,12 +160,15 @@ void GameEngine::changeScene(const std::string& sceneName)
         throw std::invalid_argument("Scene '" + sceneName + "' is not registered");
     }
 
-    if (getCurrentScene() != nullptr && currentScene_ == sceneName) {
+    if (currentScene_ == sceneName) {
         std::cout << "Scene '" << sceneName << "' is already the current scene." << std::endl;
         return;
     }
-    
-    getCurrentScene()->destroy();
+
+    if (!currentScene_.empty()) {
+        getCurrentScene()->destroy();
+    }
+
     currentScene_ = sceneName;
     getCurrentScene()->init();
 }
